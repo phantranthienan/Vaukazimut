@@ -1,18 +1,17 @@
-import { View, Text, ScrollView, Image } from "react-native";
-import React from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Redirect, router } from "expo-router";
+import { View, Text, ScrollView, Image } from 'react-native';
+import React from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Redirect, router } from 'expo-router';
 
-
-import CustomButton from "../components/CustomButton";
-import { images } from "../constants";
+import CustomButton from '../components/CustomButton';
+import { images } from '../constants';
 
 const Welcome = () => {
   return (
     <SafeAreaView>
       <ScrollView
         contentContainerStyle={{
-          height: "100%",
+          height: '100%'
         }}
       >
         <View className="h-full w-full justify-center items-center">
@@ -28,18 +27,21 @@ const Welcome = () => {
             Course d'Orientation
           </Text>
 
-          <CustomButton 
+          <CustomButton
             title="Continue with Email"
             containerStyles="mt-16"
-            handlePress={() => {router.push('/sign-in')}}
+            handlePress={() => {
+              router.push('/(auth)/sign-in');
+            }}
           />
 
-          <CustomButton 
+          <CustomButton
             title="go to mapview"
             containerStyles="mt-16"
-            handlePress={() => {router.push('/maptest')}}
+            handlePress={() => {
+              router.push('/maptest');
+            }}
           />
-
         </View>
       </ScrollView>
     </SafeAreaView>

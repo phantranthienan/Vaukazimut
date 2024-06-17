@@ -1,27 +1,28 @@
-import { View, Text, Image, Alert } from "react-native";
-import { useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Link } from "expo-router";
+import { View, Text, Image, Alert } from 'react-native';
+import { useState } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Link, router } from 'expo-router';
 
-import { images } from "../../constants";
-import CustomButton from "../../components/CustomButton";
-import FormField from "../../components/FormField";
+import { images } from '../../constants';
+import CustomButton from '../../components/CustomButton';
+import FormField from '../../components/FormField';
 
 const SignIn = () => {
   const [form, setForm] = useState({
-    username: "",
-    email: "",
-    password: "",
+    username: '',
+    email: '',
+    password: ''
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const submit = () => {
-    if (!form.email || !form.password) {
-      Alert.alert("Error", "Please fill in all the fields");
-    }
-    
+    // if (!form.email || !form.password) {
+    //   Alert.alert('Error', 'Please fill in all the fields');
+    // }
+
     setIsSubmitting(true);
+    router.push('(prof)/tab-bar');
   };
 
   return (
@@ -57,7 +58,8 @@ const SignIn = () => {
           <Text className="text-lg text-black font-pregular">
             Don't have an account?
           </Text>
-          <Link href="/sign-up"
+          <Link
+            href="/sign-up"
             className="text-lg font-psemibold text-secondary"
           >
             Sign Up
