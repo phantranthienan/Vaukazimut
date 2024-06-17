@@ -40,7 +40,12 @@ const RootLayout = () => {
     return (
         <Stack>
             <Stack.Screen name="index" options={{ headerShown: false }} />
-            <Stack.Screen name="maptest" options={{ headerShown: true }} />
+            <Stack.Screen name="maptest" options={{ headerShown: false
+                , headerTitle: "Create Balises"
+                , headerStyle: { backgroundColor: "#000000" }
+                , headerTitleStyle: { color: "#ffffff" }
+                , headerTintColor: "#ffffff"
+             }} />
             <Stack.Screen name="(auth)" options={{headerShown: false}} />
             <Stack.Screen name="(prof)" options={{headerShown: false}} />
             <Stack.Screen name="(student)" options={{headerShown: false}} />
