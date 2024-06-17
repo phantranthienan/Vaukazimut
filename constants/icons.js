@@ -11,6 +11,13 @@ import logout from "../assets/icons/logout.png";
 import eyeHide from "../assets/icons/eye-hide.png";
 import eye from "../assets/icons/eye.png";
 import play from "../assets/icons/play.png";
+import focus from "../assets/icons/focus.png";
+import add from "../assets/icons/add.png";
+import bin from "../assets/icons/bin.png";
+import balise from "../assets/icons/balise.png";
+import check from "../assets/icons/check.png";
+import start from "../assets/icons/start.png";
+import clean from "../assets/icons/clean.png";
 
 export default {
   play,
@@ -26,4 +33,11 @@ export default {
   logout,
   eyeHide,
   eye,
+  focus,
+  add,
+  bin,
+  balise,
+  check,
+  start,
+  clean
 };
