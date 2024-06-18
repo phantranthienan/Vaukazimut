@@ -10,7 +10,6 @@ import FormField from "../../components/FormField";
 const SignIn = () => {
   const [form, setForm] = useState({
     username: "",
-    email: "",
     password: "",
   });
 
@@ -25,18 +24,16 @@ const SignIn = () => {
   };
 
   return (
-    <SafeAreaView className="h-full">
       <View className="w-full h-full px-4 my-6">
         <Text className="text-2xl text-black text-semibold font-psemibold text-center">
           Sign in to Vaukazimut
         </Text>
 
         <FormField
-          title="Email"
-          value={form.email}
-          handleChangeText={(e) => setForm({ ...form, email: e })}
+          title="Username"
+          value={form.username}
+          handleChangeText={(e) => setForm({ ...form, username: e })}
           otherStyles="mt-7"
-          keyboardType="email-address"
         />
 
         <FormField
@@ -64,7 +61,6 @@ const SignIn = () => {
           </Link>
         </View>
       </View>
-    </SafeAreaView>
   );
 };
 

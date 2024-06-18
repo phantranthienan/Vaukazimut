@@ -1,5 +1,8 @@
-import { View, Text, Image, StyleSheet, Modal } from "react-native";
+import { View, Text, Image, StyleSheet, Platform } from "react-native";
 import MapView, { PROVIDER_GOOGLE, Marker, Circle } from "react-native-maps";
+import React, { useState, useEffect } from "react";
+import * as Location from "expo-location";
+
 import {
   INSA_CVL,
   STADE_JUSTICE,
@@ -7,18 +10,28 @@ import {
   CREPS,
   MAP_STYLE,
 } from "../constants/map";
-import React, { useState } from "react";
 
 import IconButton from "../components/IconButton";
 import { icons } from "../constants";
 
-const Maptest = () => {
+const StudentMap = () => {
   const [region, setRegion] = useState(INSA_CVL);
-  const [markers, setMarkers] = useState([]);
 
-  const addMarker = (coordinate) => {
-    setMarkers([...markers, coordinate]);
-  };
+  const markers = [
+    {
+      latitude: 47.082353,
+      longitude: 2.415264,
+    },
+    {
+      latitude: 47.081773,
+      longitude: 2.416305,
+    },
+    {
+      latitude: 47.081642,
+      longitude: 2.415474,
+    }
+  ];
+
 
   return (
     <>
@@ -38,11 +51,10 @@ const Maptest = () => {
             }
             setRegion(newRegion);
           }}
-          onPress={(e) => addMarker(e.nativeEvent.coordinate)}
         >
           {markers.map((marker, index) => (
             <React.Fragment key={index}>
-              <Marker coordinate={marker}>
+              <Marker coordinate={marker} title="here" description="10 points">
                 <View className="items-center justify-center pl-5">
                   <Text className="text-black font-psemibold text-xl">
                     {index + 1}
@@ -61,26 +73,6 @@ const Maptest = () => {
         </MapView>
 
         {/* *************** Render Map View ***************  */}
-
-        {/* *************** Render Longitude,Latitude ***************  */}
-
-        <View className="absolute top-20 bg-black bg-opacity-10 p-2 rounded-lg">
-          <Text className="text-white font-plight">
-            {region.latitude.toFixed(6)}, {region.longitude.toFixed(6)}
-          </Text>
-        </View>
-
-        {/* *************** Render Focus and Longitude,Latitude ***************  */}
-
-        {/* *************** Render Buttons ***************  */}
-
-        <View className="bg-black w-[70vw] rounded-full p-2 flex-row justify-between mb-3">
-          <IconButton icon={icons.bin} />
-          <IconButton icon={icons.clean} handlePress={() => setMarkers([])} />
-          <IconButton icon={icons.check} handlePress={() => console.log(markers)} />
-        </View>
-
-        {/* *************** Render Buttons ***************  */}
       </View>
     </>
   );
@@ -97,4 +89,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Maptest;
+export default StudentMap;

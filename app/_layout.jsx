@@ -1,56 +1,67 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-import { SplashScreen, Stack } from 'expo-router';
-import { useFonts } from 'expo-font';
-import { useEffect } from 'react';
+import { StatusBar } from "expo-status-bar";
+import { StyleSheet, Text, View } from "react-native";
+import { SplashScreen, Stack } from "expo-router";
+import { useFonts } from "expo-font";
+import { useEffect, useState } from "react";
 
 SplashScreen.preventAutoHideAsync();
 
 const RootLayout = () => {
-    //***************************** Load Fonts *****************************//
+  //***************************** Load Fonts *****************************//
 
-    const [fontsLoaded, error] = useFonts({
-        "Poppins-Black": require("../assets/fonts/Poppins-Black.ttf"),
-        "Poppins-Bold": require("../assets/fonts/Poppins-Bold.ttf"),
-        "Poppins-ExtraBold": require("../assets/fonts/Poppins-ExtraBold.ttf"),
-        "Poppins-ExtraLight": require("../assets/fonts/Poppins-ExtraLight.ttf"),
-        "Poppins-Light": require("../assets/fonts/Poppins-Light.ttf"),
-        "Poppins-Medium": require("../assets/fonts/Poppins-Medium.ttf"),
-        "Poppins-Regular": require("../assets/fonts/Poppins-Regular.ttf"),
-        "Poppins-SemiBold": require("../assets/fonts/Poppins-SemiBold.ttf"),
-        "Poppins-Thin": require("../assets/fonts/Poppins-Thin.ttf"),
-    });
-    useEffect(() => {
-        if (error) throw error;
-        if (fontsLoaded) {
-            SplashScreen.hideAsync();
-        }
-    }, [fontsLoaded, error]);
-
-    if (!fontsLoaded) {
-        return null;
+  const [fontsLoaded, error] = useFonts({
+    "Poppins-Black": require("../assets/fonts/Poppins-Black.ttf"),
+    "Poppins-Bold": require("../assets/fonts/Poppins-Bold.ttf"),
+    "Poppins-ExtraBold": require("../assets/fonts/Poppins-ExtraBold.ttf"),
+    "Poppins-ExtraLight": require("../assets/fonts/Poppins-ExtraLight.ttf"),
+    "Poppins-Light": require("../assets/fonts/Poppins-Light.ttf"),
+    "Poppins-Medium": require("../assets/fonts/Poppins-Medium.ttf"),
+    "Poppins-Regular": require("../assets/fonts/Poppins-Regular.ttf"),
+    "Poppins-SemiBold": require("../assets/fonts/Poppins-SemiBold.ttf"),
+    "Poppins-Thin": require("../assets/fonts/Poppins-Thin.ttf"),
+  });
+  useEffect(() => {
+    if (error) throw error;
+    if (fontsLoaded) {
+      SplashScreen.hideAsync();
     }
+  }, [fontsLoaded, error]);
 
-    if (!fontsLoaded && !error) {
-        return null;
-    }
+  if (!fontsLoaded) {
+    return null;
+  }
 
-    //***************************** Load Fonts *****************************//
+  //***************************** Load Fonts *****************************//
 
-    return (
-        <Stack>
-            <Stack.Screen name="index" options={{ headerShown: false }} />
-            <Stack.Screen name="maptest" options={{ headerShown: false
-                , headerTitle: "Create Balises"
-                , headerStyle: { backgroundColor: "#000000" }
-                , headerTitleStyle: { color: "#ffffff" }
-                , headerTintColor: "#ffffff"
-             }} />
-            <Stack.Screen name="(auth)" options={{headerShown: false}} />
-            <Stack.Screen name="(prof)" options={{headerShown: false}} />
-            <Stack.Screen name="(student)" options={{headerShown: false}} />
-        </Stack>
-    )
-}
+  return (
+    <Stack>
+      <Stack.Screen name="index" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="profMap"
+        options={{
+          headerShown: false,
+          headerTitle: "Create Balises",
+          headerStyle: { backgroundColor: "#000000" },
+          headerTitleStyle: { color: "#ffffff" },
+          headerTintColor: "#ffffff",
+        }}
+      />
+
+      <Stack.Screen
+        name="studentMap"
+        options={{
+          headerShown: false,
+          headerTitle: "Run Course",
+          headerStyle: { backgroundColor: "#000000" },
+          headerTitleStyle: { color: "#ffffff" },
+          headerTintColor: "#ffffff",
+        }}
+      />
+      <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+      <Stack.Screen name="(prof)" options={{ headerShown: false }} />
+      <Stack.Screen name="(student)" options={{ headerShown: false }} />
+    </Stack>
+  );
+};
 
 export default RootLayout;

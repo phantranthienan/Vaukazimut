@@ -3,7 +3,6 @@ import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Redirect, router } from "expo-router";
 
-
 import CustomButton from "../components/CustomButton";
 import { images } from "../constants";
 
@@ -28,18 +27,29 @@ const Welcome = () => {
             Course d'Orientation
           </Text>
 
-          <CustomButton 
+          <CustomButton
             title="Continue with Email"
             containerStyles="mt-16"
-            handlePress={() => {router.push('/sign-in')}}
+            handlePress={() => {
+              router.push("/sign-in");
+            }}
           />
 
-          <CustomButton 
-            title="go to mapview"
+          <CustomButton
+            title="go to map for prof"
             containerStyles="mt-16"
-            handlePress={() => {router.push('/maptest')}}
+            handlePress={() => {
+              router.push("/profMap");
+            }}
           />
 
+          <CustomButton
+            title="go to map for student"
+            containerStyles="mt-16"
+            handlePress={() => {
+              router.push("/studentMap");
+            }}
+          />
         </View>
       </ScrollView>
     </SafeAreaView>
