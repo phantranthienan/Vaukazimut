@@ -1,12 +1,37 @@
 import { View, Text, ScrollView, Image } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Redirect, router } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import CustomButton from "../components/CustomButton";
 import { images } from "../constants";
+import { getToken, getRole } from "../utils/handleAsyncStorage";
 
 const Welcome = () => {
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const token = await getToken();
+        const role = await getRole();
+
+        console.log(token, role);
+        if (token && role) {
+          if (role === "Coach") {
+            router.replace("/homeProf");
+          } else if (role === "Runner") {
+            router.replace("/homeStu");
+          }
+        } 
+      } catch (error) {
+        console.error("Error checking auth:", error);
+      }
+    };
+
+    checkAuth();
+  }, []);
+
   return (
     <SafeAreaView>
       <ScrollView
@@ -28,11 +53,12 @@ const Welcome = () => {
           </Text>
 
           <CustomButton
-            title="Continue with Email"
+            title="Continue"
             containerStyles="mt-16"
             handlePress={() => {
-              router.push("/sign-in");
-            }}
+                router.push("/sign-in");
+              }
+            }
           />
 
           {/* <CustomButton

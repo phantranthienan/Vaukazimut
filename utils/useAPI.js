@@ -30,6 +30,7 @@ const signUp = async (username, email, password, firstName, lastName, department
         if (res.data.data) {
             Alert.alert(res.data.message);
         } 
+        return res
     } catch (err) {
         console.log(err.response.data);
         if (err.response.data) {
@@ -48,16 +49,8 @@ const signIn = async (username, password) => {
             password: password,
         }
         const res = await apiSource.post('/api/auth/token/login/', req);
-        console.log(res.data)
-        if (res.data.data) {
-            Alert.alert(res.data.message);
-        }
+        return res
     } catch (err) {
-        if (err.response.data.non_field_errors) {
-            Alert.alert("Invalid username or password. Please try again.");
-        } else {
-            Alert.alert("An unexpected error occurred.");
-        }
         console.error(err);
     }
 }
