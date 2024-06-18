@@ -1,11 +1,12 @@
 import { View, Text, Image, Alert } from "react-native";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Link } from "expo-router";
 
 import { images } from "../../constants";
 import CustomButton from "../../components/CustomButton";
 import FormField from "../../components/FormField";
+import { signIn } from "../../utils/useAPI";
 
 const SignIn = () => {
   const [form, setForm] = useState({
@@ -15,11 +16,17 @@ const SignIn = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  useEffect(() => {
+    if (isSubmitting) {
+      signIn(form.username, form.password);
+      setIsSubmitting(false);
+    }
+  }, [isSubmitting, form]);
+
   const submit = () => {
-    if (!form.email || !form.password) {
+    if (!form.username || !form.password) {
       Alert.alert("Error", "Please fill in all the fields");
     }
-    
     setIsSubmitting(true);
   };
 

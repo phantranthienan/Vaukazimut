@@ -35,7 +35,7 @@ const Welcome = () => {
             }}
           />
 
-          <CustomButton
+          {/* <CustomButton
             title="go to map for prof"
             containerStyles="mt-16"
             handlePress={() => {
@@ -49,7 +49,7 @@ const Welcome = () => {
             handlePress={() => {
               router.push("/studentMap");
             }}
-          />
+          /> */}
         </View>
       </ScrollView>
     </SafeAreaView>
