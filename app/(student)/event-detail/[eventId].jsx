@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, Alert, ScrollView, TouchableOpacity } from "react-native";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { fetchEventDetail } from "../../../utils/useAPI"; // Ensure this path is correct
 
 const EventDetail = () => {
   const { eventId } = useLocalSearchParams(); // Access the eventId from the query params
   const [event, setEvent] = useState(null);
+  const router = useRouter();
 
   useEffect(() => {
     const getEventDetail = async () => {
@@ -29,6 +30,10 @@ const EventDetail = () => {
   if (!event) {
     return <Text>Loading...</Text>;
   }
+
+  const handleRaceSelect = (race) => {
+    router.push(`/event-detail/map-race/${race.id}`);
+  };
 
   return (
     <ScrollView className="mt-8 h-full">
@@ -62,7 +67,7 @@ const EventDetail = () => {
           <TouchableOpacity
             activeOpacity={0.8}
             key={race.id}
-            onPress={() => {}}
+            onPress={() => handleRaceSelect(race)}
             className="m-auto h-16 w-full bg-black my-2 flex-row items-center justify-between px-4 rounded-2xl"
           >
             <Text className="text-white text-2xl font-pbold">{race.name}</Text>

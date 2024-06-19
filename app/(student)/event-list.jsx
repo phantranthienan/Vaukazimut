@@ -41,6 +41,19 @@ const EventList = () => {
     }
   };
 
+  if (events.length === 0) {
+    return (
+      <View className="h-full items-center justify-center">
+        <Text>No event available...</Text>
+        <TouchableOpacity onPress={handleLogout}>
+          <Text style={{ color: "blue", textDecorationLine: "underline" }}>
+            Log out
+          </Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   return (
     <View>
       {events.map((event) => (

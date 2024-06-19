@@ -21,6 +21,8 @@ const updateAxios = () => {
     );
 }
 
+// For log in, log out, sign up
+
 const signUp = async (username, email, password, firstName, lastName, department, secretCode) => {
     try {
         let req = secretCode ? {
@@ -82,6 +84,8 @@ const logOut = async () => {
     }
 }
 
+// Handle group and event
+
 const fetchGroups = async () => {
     try {
         const response = await apiSource.get('/group-runners-coach/');
@@ -108,7 +112,7 @@ const joinGroup = async (groupId) => {
 
 const fetchMyEvents = async () => {
     try {
-        const res = await apiSource.get('api/my-event-runner/')
+        const res = await apiSource.get('/my-event-runner/')
         return res.data;
     } catch (err) {
         console.error("Error fetching my events:", err);
@@ -117,15 +121,58 @@ const fetchMyEvents = async () => {
 
 const fetchEventDetail = async (eventId) => {
     try {
-        const res = await apiSource.get(`api/event-detail-runner/${eventId}/`)
+        const res = await apiSource.get(`/event-detail-runner/${eventId}/`)
         return res.data;
     } catch (err) {
         console.error("Error fetching event detail:", err);
     }
 }
 
+// Handle map student
+
+const fetchRaceDetails = async (raceId) => {
+    try {
+        const res = await apiSource.get(`/race-runner/${raceId}/`)
+        return res.data;
+    }
+    catch (err) {
+        console.error("Error fetching race details:", err);
+    }
+}
+
+const sendValidatedBalise = async (userLocation, number, userId) => {
+    const body = {
+        number: number,
+        longitude: userLocation.longitude,
+        latitude: userLocation.latitude,
+        race_runner_id: userId,
+    }
+    try {
+        const res = await apiSource.post('/record-checkpoint/', body);
+        return res.data;
+    } catch (err) {
+        console.error("Error sending validated balise:", err);
+    }
+}
+
+const fetchResult = async (userId, totalTime) => {
+    const body = {
+        race_runner_id: userId,
+        total_time: totalTime,
+    }
+    try {
+        const res = await apiSource.patch('/record-result/', body);
+        return res.data;
+    } catch (err) {
+        console.error("Error fetching result:", err);
+    }
+}
+
+
+
 export {
     signUp, signIn, logOut,
     updateAxios, fetchGroups, joinGroup,
-    fetchMyEvents, fetchEventDetail
+    fetchMyEvents, fetchEventDetail,
+    fetchRaceDetails
 }

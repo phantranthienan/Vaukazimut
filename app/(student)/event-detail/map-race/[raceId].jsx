@@ -1,15 +1,21 @@
 import { View, Text, Image, StyleSheet, Button, Alert, Modal, TextInput, TouchableOpacity } from "react-native";
 import MapView, { PROVIDER_GOOGLE, Marker, Circle } from "react-native-maps";
 import React, { useState, useEffect, useRef } from "react";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import * as Location from "expo-location";
 
-import { INSA_CVL, MAP_STYLE } from "../constants/map";
-import { icons } from "../constants";
+
+import { INSA_CVL, MAP_STYLE } from "../../../../constants/map";
+import { icons } from "../../../../constants";
+import { fetchRaceDetails } from "../../../../utils/useAPI";
 
 const StudentMap = () => {
+    const { raceId } = useLocalSearchParams();
   const [region, setRegion] = useState(INSA_CVL);
   const [userLocation, setUserLocation] = useState(null);
+  const [markers, setMarkers] = useState([]);
 
+    const [timeLimit, setTimeLimit] = useState(0);
   const [isStarted, setIsStarted] = useState(false);
   const [isTerminated, setIsTerminated] = useState(false);
   const [time, setTime] = useState(0);
@@ -20,26 +26,43 @@ const StudentMap = () => {
   const [baliseInput, setBaliseInput] = useState('');
 
   // Array of markers with number, points, and location (latitude, longitude)
-  const markers = [
-    {
-      number: 1,
-      point: 10,
-      latitude: 47.082353,
-      longitude: 2.415264,
-    },
-    {
-      number: 2,
-      point: 20,
-      latitude: 47.081773,
-      longitude: 2.416305,
-    },
-    {
-      number: 3,
-      point: 30,
-      latitude: 47.081642,
-      longitude: 2.415474,
-    },
-  ];
+//   const markers = [
+//     {
+//       number: 1,
+//       point: 10,
+//       latitude: 47.082353,
+//       longitude: 2.415264,
+//     },
+//     {
+//       number: 2,
+//       point: 20,
+//       latitude: 47.081773,
+//       longitude: 2.416305,
+//     },
+//     {
+//       number: 3,
+//       point: 30,
+//       latitude: 47.081642,
+//       longitude: 2.415474,
+//     },
+//   ];
+
+    useEffect(() => {
+        const getRaceDetails = async () => {
+            try {
+                const raceData = await fetchRaceDetails(raceId);
+                setMarkers(raceData.checkpoints);
+                setTimeLimit(raceData.time_limit);
+            } catch (err) {
+                console.error(err);
+                Alert.alert("Error", "Failed to fetch race details. Please try again later."); 
+            }
+        };
+
+        if (raceId) {
+            getRaceDetails();
+        }
+    }, [raceId])
 
   // Request location permissions and get the initial location
   useEffect(() => {

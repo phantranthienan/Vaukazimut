@@ -75,9 +75,9 @@ const SignIn = () => {
   };
 
   return (
-    <View className="w-full h-full px-4 my-6">
-      <Text className="text-2xl text-black text-semibold font-psemibold text-center">
-        Sign in to Vaukazimut
+    <View className="w-full h-full px-4 bg-primary-emerald">
+      <Text className="text-4xl text-black text-semibold font-psemibold text-center mt-8">
+        Sign In to Vaukazimut
       </Text>
 
       <FormField
@@ -97,8 +97,9 @@ const SignIn = () => {
       <CustomButton
         title="Sign In"
         handlePress={submit}
-        containerStyles="mt-7"
+        containerStyles="mt-7 bg-black w-full"
         isLoading={isSubmitting}
+        textStyles="text-2xl"
       />
 
       <View className="justify-center pt-5 flex-column items-center">
