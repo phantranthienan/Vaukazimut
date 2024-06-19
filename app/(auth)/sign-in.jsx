@@ -17,6 +17,27 @@ const SignIn = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const token = await getToken();
+        const role = await getRole();
+        if (token && role) {
+          updateAxios();
+          if (role === "Coach") {
+            router.replace("/homeProf");
+          } else if (role === "Runner") {
+            router.replace("/group-list");
+          }
+        } 
+      } catch (error) {
+        console.error("Error checking auth:", error);
+      }
+    };
+
+    checkAuth();
+  }, []);
+
   const submit = async () => {
     if (!form.username || !form.password) {
       Alert.alert("Error", "Please fill in all the fields");

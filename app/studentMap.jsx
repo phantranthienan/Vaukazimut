@@ -1,111 +1,61 @@
-import {
-  Modal,
-  Button,
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  Alert,
-  TextInput,
-  Platform,
-  PermissionsAndroid
-} from "react-native";
+import { View, Text, Image, StyleSheet, Button, Alert, Modal, TextInput, TouchableOpacity } from "react-native";
 import MapView, { PROVIDER_GOOGLE, Marker, Circle } from "react-native-maps";
 import React, { useState, useEffect, useRef } from "react";
-
-import {
-  INSA_CVL,
-  STADE_JUSTICE,
-  LAC_DAURON,
-  CREPS,
-  MAP_STYLE,
-} from "../constants/map";
-
-import IconButton from "../components/IconButton";
+import * as Location from "expo-location";
+import { INSA_CVL, MAP_STYLE } from "../constants/map";
 import { icons } from "../constants";
-import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
 const StudentMap = () => {
   const [region, setRegion] = useState(INSA_CVL);
   const [userLocation, setUserLocation] = useState(null);
+
   const [isStarted, setIsStarted] = useState(false);
   const [isTerminated, setIsTerminated] = useState(false);
-  const [validatedBalises, setValidatedBalises] = useState([]);
   const [time, setTime] = useState(0);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [baliseToValidate, setBaliseToValidate] = useState("");
-  const [baliseInput, setBaliseInput] = useState('');
-
   const timerRef = useRef(null);
+
+  const [validatedBalises, setValidatedBalises] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [baliseInput, setBaliseInput] = useState('');
 
   // Array of markers with number, points, and location (latitude, longitude)
   const markers = [
     {
       number: 1,
-      points: 10,
+      point: 10,
       latitude: 47.082353,
       longitude: 2.415264,
     },
     {
       number: 2,
-      points: 10,
+      point: 20,
       latitude: 47.081773,
       longitude: 2.416305,
     },
     {
       number: 3,
-      points: 10,
+      point: 30,
       latitude: 47.081642,
       longitude: 2.415474,
     },
   ];
 
   // Request location permissions and get the initial location
-  useEffect(() => requestLocationPermission(), []);
-
-  const requestLocationPermission = async () => {
-    try {
-      if (Platfromm.OS === 'androind') {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-          {
-            title: "Location Permission",
-            message: "This app requires access to your location.",
-            buttonNeutral: "Ask Me Later",
-            buttonNegative: "Cancel",
-            buttonPositive: "OK",
-          }
-        );
-
-        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          console.log("Location permission granted");
-          getUserLocation();
-        } else {
-          Alert.alert("Location permission denied", "Please enable location services to use the app.");
-        }
-      } else {
-        getUserLocation();
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        console.error("Permission to access location was denied");
+        console.log("Please enable location services and restart the app.")
+        return;
       }
-    } catch (error) {
-      console.error("Error requesting location permission:", error);
-    }
-  }
 
-  const getUserLocation = () => {
-    Geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords;
-        setUserLocation({ latitude, longitude });
-      },
-      (error) => {
-        console.error("Error getting location:", error);
-        Alert.alert("Error getting location", "Please enable location services to use the app.");
-      },
-      { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
-    );
-  }
-  console.log("User location:", userLocation);
+      let location = await Location.getCurrentPositionAsync({});
+      setUserLocation(location.coords);
+    })();
+  }, []);
 
+  console.log("User location:", userLocation)
 
   // Manage the timer
   useEffect(() => {
@@ -137,17 +87,13 @@ const StudentMap = () => {
 
   // Validate the balise
   const validateBalise = (number) => {
-    const baliseIndex = markers.findIndex(
-      (marker) => marker.number === parseInt(number)
-    );
+    const baliseIndex = markers.findIndex((marker) => marker.number === parseInt(number));
     if (baliseIndex !== -1 && !validatedBalises.includes(number)) {
       setValidatedBalises([...validatedBalises, number]);
       sendValidationToDatabase(userLocation, number);
+      setModalVisible(false);
     } else {
-      Alert.alert(
-        "Invalid Balise",
-        "The balise number entered is invalid or already validated."
-      );
+      Alert.alert("Invalid Balise", "The balise number entered is invalid or already validated.");
     }
   };
 
@@ -160,12 +106,11 @@ const StudentMap = () => {
   return (
     <>
       <View style={styles.container}>
-        {/* *************** Render Map View ***************  */}
-
         <MapView
+          showsUserLocation={true}
           paddingAdjustmentBehavior="never"
           style={styles.map}
-          prorvider={PROVIDER_GOOGLE}
+          provider={PROVIDER_GOOGLE}
           customMapStyle={MAP_STYLE}
           initialRegion={region}
           region={region}
@@ -181,88 +126,60 @@ const StudentMap = () => {
             return (
               <React.Fragment key={index}>
                 <Marker
-                  coordinate={{
-                    latitude: marker.latitude,
-                    longitude: marker.longitude,
-                  }}
+                  coordinate={{ latitude: marker.latitude, longitude: marker.longitude }}
                   title={`Balise ${marker.number}`}
-                  description={`${marker.points} points`}
+                  description={`${marker.point} points`}
                 >
                   <View style={styles.marker}>
-                    <Text
-                      style={
-                        isValidated
-                          ? styles.validatedMarkerText
-                          : styles.markerText
-                      }
-                    >
+                    <Text style={isValidated ? styles.validatedMarkerText : styles.markerText}>
                       {marker.number}
                     </Text>
                     <Image
                       source={icons.balise}
-                      style={
-                        isValidated
-                          ? styles.validatedMarkerImage
-                          : styles.markerImage
-                      }
+                      style={isValidated ? styles.validatedMarkerImage : styles.markerImage}
                     />
                   </View>
                 </Marker>
                 <Circle
-                  center={{
-                    latitude: marker.latitude,
-                    longitude: marker.longitude,
-                  }}
+                  center={{ latitude: marker.latitude, longitude: marker.longitude }}
                   radius={10} // radius in meters
-                  strokeColor={
-                    isValidated ? "rgba(0,255,0,0.5)" : "rgba(0,0,255,0.5)"
-                  }
-                  fillColor={
-                    isValidated ? "rgba(0,255,0,0.1)" : "rgba(0,0,255,0.1)"
-                  }
+                  strokeColor={isValidated ? "rgba(0,255,0,0.5)" : "rgba(0,0,255,0.5)"}
+                  fillColor={isValidated ? "rgba(0,255,0,0.1)" : "rgba(0,0,255,0.1)"}
                 />
               </React.Fragment>
             );
           })}
-          {userLocation && (
-            <Marker
-              coordinate={{ latitude: userLocation.latitude, longitude: userLocation.longitude }}
-              title="Your Location"
-            >
-              <View style={styles.userMarker}>
-                <Text style={styles.userMarkerText}>You</Text>
-              </View>
-            </Marker>
-          )}
         </MapView>
 
-        {/* *************** Render Map View ***************  */}
         <View style={styles.buttons}>
           {!isStarted && !isTerminated && (
-            <Button title="Start" onPress={startTimer} />
+            <TouchableOpacity className="bg-black rounded-xl w-[40vw] p-4 justify-center" onPress={() => startTimer()}>
+              <Text className="w-full text-center text-white font-pbold text-3xl">Start</Text>
+            </TouchableOpacity>
           )}
           {isStarted && !isTerminated && (
             <>
-              <Button
-                title="Validate Balise"
-                onPress={() => setModalVisible(true)}
-              />
-              <Button title="Terminate" onPress={terminateSession} />
+              <TouchableOpacity className="bg-white rounded-xl w-[30vw] h-12 justify-center border-2" onPress={() => setModalVisible(true)}>
+                <Text className="w-full text-center font-pregular">Validate Balise</Text>
+              </TouchableOpacity>
+              <TouchableOpacity className="bg-white rounded-xl w-[30vw] h-12 justify-center border-2" onPress={terminateSession}>
+                <Text className="w-full text-center font-pregular">Terminate</Text>
+              </TouchableOpacity>
             </>
           )}
         </View>
+
         {isStarted && (
           <View style={styles.timer}>
-            <Text>
-              Time: {new Date(time * 1000).toISOString().substr(11, 8)}
-            </Text>
+            <Text className="text-xl font-psemibold">Time: {new Date(time * 1000).toISOString().substr(11, 8)}</Text>
           </View>
         )}
         {isTerminated && (
           <View style={styles.summary}>
-            <Text>Number of balises validated: {validatedBalises.length}</Text>
+            <Text style={styles.summaryText}>Number of balises validated: {validatedBalises.length}</Text>
           </View>
         )}
+
         {/* Modal for validating balise */}
         <Modal
           animationType="slide"
@@ -279,18 +196,23 @@ const StudentMap = () => {
                 value={baliseInput}
                 onChangeText={setBaliseInput}
               />
-              <Button
-                title="Validate"
-                onPress={() => validateBalise(baliseInput)}
-              />
-              <Button
-                title="Cancel"
-                onPress={() => setModalVisible(false)}
-                color="red"
-              />
+
+              <View className="w-[80%] flex-row justify-center">
+
+              <TouchableOpacity className="mx-auto bg-black w-[40%] h-8 justify-center rounded-md" onPress={() => validateBalise(baliseInput)}>
+                <Text className="w-full text-center text-white font-pmedium text-sm">Validate</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity className="mx-auto bg-red-600 w-[40%] h-8 justify-center rounded-md" onPress={() => setModalVisible(false)}>
+                <Text className="w-full text-center text-white font-pmedium text-sm">Cancel</Text>
+              </TouchableOpacity>
+
+              </View>
+
             </View>
           </View>
         </Modal>
+
       </View>
     </>
   );
@@ -330,38 +252,22 @@ const styles = StyleSheet.create({
   },
   buttons: {
     position: "absolute",
-    bottom: 50,
+    bottom: 75,
     left: 0,
     right: 0,
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
-  },
-  button: {
-    backgroundColor: "#333", // Dark background color
-    borderRadius: 20, // More rounded corners
-    padding: 10,
-    paddingHorizontal: 20,
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  cancelButton: {
-    backgroundColor: "red",
+    marginLeft: 20,
+    marginRight: 20,
   },
   timer: {
     position: "absolute",
-    top: 50,
+    top: 75,
     left: 0,
     right: 0,
     justifyContent: "center",
     alignItems: "center",
-  },
-  timerText: {
-    fontSize: 20,
-    fontWeight: "bold",
   },
   summary: {
     position: "absolute",

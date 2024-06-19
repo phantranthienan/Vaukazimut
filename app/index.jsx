@@ -11,27 +11,6 @@ import { updateAxios } from "../utils/useAPI";
 
 const Welcome = () => {
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const token = await getToken();
-        const role = await getRole();
-        if (token && role) {
-          updateAxios();
-          if (role === "Coach") {
-            router.replace("/homeProf");
-          } else if (role === "Runner") {
-            router.replace("/group-list");
-          }
-        } 
-      } catch (error) {
-        console.error("Error checking auth:", error);
-      }
-    };
-
-    checkAuth();
-  }, []);
-
   return (
     <SafeAreaView>
       <ScrollView
