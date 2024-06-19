@@ -153,6 +153,7 @@ const CreateNewEvent = () => {
       description: null,
       location: maps[name]
     });
+    console.log(events);
     handleReload();
   };
 
@@ -244,25 +245,27 @@ const CreateNewEvent = () => {
 function fixMap(name, addedMarkers) {
   let showMap = true;
   return (
-    <Modal
-      animationType="slide"
-      transparent={true}
-      visible={showMap}
-      onRequestClose={() => {}}
-    >
-      <View className="justify-center items-center my-2 h-full bg-white rounded-xl p-9 items-center shadow-lg w-max">
-        <MapProf name={name} addedMarkers={addedMarkers} />
-        <CustomButton
-          title="Close"
-          handlePress={() => {
-            showMap = false;
-            console.log(name);
-          }}
-          containerStyles="h-min m-0 bg-cyan-400"
-          textStyles="text-base font-thin"
-        ></CustomButton>
-      </View>
-    </Modal>
+    <View className="flex-1 justify-center items-center w-full h-full">
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={showMap}
+        onRequestClose={() => {}}
+      >
+        <View className="justify-center items-center my-2 h-full bg-white rounded-xl p-9 items-center shadow-lg w-max">
+          <MapProf name={name} addedMarkers={addedMarkers} />
+          <CustomButton
+            title="Close"
+            handlePress={() => {
+              showMap = !showMap;
+              console.log(name);
+            }}
+            containerStyles="h-min m-0 bg-cyan-400"
+            textStyles="text-base font-thin"
+          ></CustomButton>
+        </View>
+      </Modal>
+    </View>
   );
 }
 const ShowEvents = () => {
@@ -284,15 +287,15 @@ const ShowEvents = () => {
   return (
     <FlatList
       data={Object.keys(events)}
-      extraData={counter}
       keyExtractor={(eventName) => eventName}
       renderItem={({ item }) => (
-        <TouchableOpacity className="flex-col h-fit w-full m-5 px-5 py-2 bg-cyan-100 rounded-xl shadow-lg">
+        <TouchableOpacity className="flex-row h-fit w-full m-5 px-5 py-2 bg-cyan-100 rounded-xl shadow-lg">
           <Text className="text-xl text-black font-semibold py">{item}</Text>
           <IconButton
-            icon={icons.placeholder}
+            containerStyles="aspect-square w-10 justify-items-end"
+            icon={icons.bookmark}
             handlePress={() => {
-              fixMap({ item }, events[{ item }].location);
+              fixMap(item, events[item]['location']);
             }}
           ></IconButton>
         </TouchableOpacity>
