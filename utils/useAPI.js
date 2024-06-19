@@ -3,8 +3,7 @@ import { Alert } from 'react-native';
 import { getId, getToken, clearStorage } from './handleAsyncStorage';
 
 const apiSource = axios.create({
-  baseURL:
-    'https://django-apis-project-application-a52o4sa8a.vercel.app/?fbclid=IwZXh0bgNhZW0CMTAAAR2M--qsgSVdscWZMS3IJxuHWSGkYErbcQKJNz3FaBoCUCDrHSq9iObLCvE_aem_ZmFrZWR1bW15MTZieXRlcw'
+  baseURL: 'https://project-programmation-version2.vercel.app'
 });
 
 const updateAxios = () => {
@@ -52,7 +51,7 @@ const signUp = async (
           department: department,
           role: 'Runner'
         };
-    const res = await apiSource.post('/api/auth/users/', req);
+    const res = await apiSource.post('/auth/users/', req);
     console.log(res.data);
     if (res.data.data) {
       Alert.alert(res.data.message + ' Please sign in.');
@@ -75,7 +74,7 @@ const signIn = async (username, password) => {
       username: username,
       password: password
     };
-    const res = await apiSource.post('/api/auth/token/login/', req);
+    const res = await apiSource.post('/auth/token/login/', req);
     return res;
   } catch (err) {
     console.error(err);
@@ -84,7 +83,7 @@ const signIn = async (username, password) => {
 
 const logOut = async () => {
   try {
-    const res = await apiSource.post('/api/auth/token/logout/');
+    const res = await apiSource.post('/auth/token/logout/');
     await clearStorage();
     updateAxios();
     Alert.alert(res.data.message);
@@ -95,21 +94,20 @@ const logOut = async () => {
 
 const fetchGroups = async () => {
   try {
-    const response = await apiSource.get('/api/group-runners-coach/');
+    const response = await apiSource.get('/group-runners-coach/');
     return response.data;
   } catch (error) {
     console.error('Error fetching groups:', error);
   }
 };
 
-const postGroup = async (name, department) => {
+const createGroup = async (name, department) => {
   try {
-    let req = {
-      name: name,
-      department: department
-    };
-    const res = await apiSource.post('/api/group-runners-coach/', req);
-    console.log(res.data);
+    let req = { name: name, department: department };
+    const res = await apiSource.post('/group-runners-coach/', req);
+    if (res.data.data) {
+      Alert.alert(res.data.message + ' Please sign in.');
+    }
     return res;
   } catch (err) {
     console.log(err.response.data);
@@ -130,7 +128,7 @@ const joinGroup = async (groupId) => {
       runner_id: id,
       group_id: groupId
     };
-    const res = await apiSource.post('/api/join-group/', req);
+    const res = await apiSource.post('/join-group/', req);
     return res;
   } catch (err) {
     console.log('Error joining group:', err);
@@ -139,7 +137,7 @@ const joinGroup = async (groupId) => {
 
 const fetchMyEvents = async () => {
   try {
-    const res = await apiSource.get('api/my-event-runner/');
+    const res = await apiSource.get('/my-event-runner/');
     return res.data;
   } catch (err) {
     console.error('Error fetching my events:', err);
@@ -148,10 +146,52 @@ const fetchMyEvents = async () => {
 
 const fetchEventDetail = async (eventId) => {
   try {
-    const res = await apiSource.get(`api/event-detail-runner/${eventId}/`);
+    const res = await apiSource.get(`/event-detail-runner/${eventId}/`);
     return res.data;
   } catch (err) {
     console.error('Error fetching event detail:', err);
+  }
+};
+
+const createEvent = async ({
+  name,
+  start,
+  end,
+  location_id,
+  coach_id,
+  group_runner_id,
+  department
+}) => {
+  try {
+    let req = {
+      name: name,
+      start: start,
+      end: end,
+      location_id: location_id,
+      coach_id: coach_id,
+      group_runner_id: group_runner_id,
+      department: department
+    };
+    const res = await apiSource.post('/auth/events-coach/', req);
+    // console.log(res.data);
+    return res;
+  } catch (err) {
+    console.log(err.response.data);
+    if (err.response.data) {
+      Alert.alert(err.response.data.message);
+    } else {
+      Alert.alert('An unexpected error occurred.');
+    }
+    console.error(err);
+  }
+};
+
+const fetchAllEvents = async () => {
+  try {
+    const res = await apiSource.get('/group-runners-coach/');
+    return res.data;
+  } catch (err) {
+    console.error('Error fetching all events:', err);
   }
 };
 
@@ -160,9 +200,11 @@ export {
   signIn,
   logOut,
   updateAxios,
-  postGroup,
+  createGroup,
   fetchGroups,
   joinGroup,
   fetchMyEvents,
-  fetchEventDetail
+  fetchEventDetail,
+  createEvent,
+  fetchAllEvents
 };

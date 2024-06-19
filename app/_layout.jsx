@@ -2,7 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import { SplashScreen, Stack } from 'expo-router';
 import { useFonts } from 'expo-font';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -31,20 +31,27 @@ const RootLayout = () => {
     return null;
   }
 
-  if (!fontsLoaded && !error) {
-    return null;
-  }
-
   //***************************** Load Fonts *****************************//
 
   return (
     <Stack>
       <Stack.Screen name="index" options={{ headerShown: false }} />
       <Stack.Screen
-        name="maptest"
+        name="profMap"
         options={{
-          headerShown: true,
+          headerShown: false,
           headerTitle: 'Create Balises',
+          headerStyle: { backgroundColor: '#000000' },
+          headerTitleStyle: { color: '#ffffff' },
+          headerTintColor: '#ffffff'
+        }}
+      />
+
+      <Stack.Screen
+        name="studentMap"
+        options={{
+          headerShown: false,
+          headerTitle: 'Run Course',
           headerStyle: { backgroundColor: '#000000' },
           headerTitleStyle: { color: '#ffffff' },
           headerTintColor: '#ffffff'

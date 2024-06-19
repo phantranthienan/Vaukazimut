@@ -19,11 +19,13 @@ import DatePicker from 'react-native-modern-datepicker';
 import { getToday, getFormatedDate } from 'react-native-modern-datepicker';
 import { useNavigation } from '@react-navigation/native';
 
-const CreateNewRunBtn = ({ onRunCreated }) => {
+const CreateNewEvent = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [name, setName] = useState('');
   const [selectedDate, setSelectedDate] = useState(getToday());
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [selectedTime, setSelectedTime] = useState();
+  const [showTimePicker, setShowTimePicker] = useState();
 
   const today = getToday();
   const startDate = getFormatedDate(today, 'DD/MM/YYYY');
@@ -32,7 +34,6 @@ const CreateNewRunBtn = ({ onRunCreated }) => {
     // Handle the creation of a new run here
     setModalVisible(false);
     setShowDatePicker(false);
-    onRunCreated({ name, selectedDate });
   };
 
   return (
@@ -55,7 +56,8 @@ const CreateNewRunBtn = ({ onRunCreated }) => {
                 onChangeText={setName}
                 value={name}
               />
-              <Text className="mb-2 text-base">Date</Text>
+              <Text className="mb-2 text-lg">Date and Time</Text>
+              <Text className="mb-2 text-base">Start</Text>
               <View className="flex-row items-center w-full pl-2 rounded border border-inherit">
                 <Text className="flex-1">{selectedDate}</Text>
                 <IconButton
@@ -128,7 +130,7 @@ const CreateSession = ({ sessionName, sessionDate, map }) => {
   );
 };
 
-const CreateNewEvent = () => {
+const CreateNewRunBtn = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [name, setName] = useState('');
   const [groupRunner, setGroupRunner] = useState(groups[0]);
@@ -166,7 +168,7 @@ const CreateNewEvent = () => {
         <View className="flex-1 justify-center items-center">
           <View className="m-5 bg-white rounded-xl p-9 items-center shadow-lg">
             <Text className="text-xl text-black font-semibold text-center mb-4">
-              Create a new map run!
+              Create a new Event!
             </Text>
             <View className="w-full">
               <Text className="mb-2 text-base">Name</Text>

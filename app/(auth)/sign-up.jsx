@@ -1,80 +1,32 @@
-import { Image, View, Text, ScrollView, Alert } from 'react-native'
-import React from 'react'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { useState } from 'react'
-import { Link, router } from 'expo-router'
-
-import { images } from '../../constants';
-import FormField from '../../components/FormField';
+import { View, Text } from 'react-native';
+import React from 'react';
 import CustomButton from '../../components/CustomButton';
+import { router } from 'expo-router';
 
 const SignUp = () => {
-  const [form, setForm] = useState({
-    username: '',
-    email: '',
-    password: ''
-  })
-
-  const [isSubmitting, setIsSubmitting] = useState(false)
-
-  const submit = async () => {
-    if (!form.username || !form.email || !form.password) {
-      Alert.alert('Error', 'Please fill in all the fields')
-    };
-
-    setIsSubmitting(true);
-  }
-
   return (
-    <SafeAreaView className="h-full">
-      <ScrollView>
-        <View className="w-full h-full px-4 my-6">
-          <Text className="text-2xl text-black text-semibold font-psemibold text-center">
-            Sign up to Vaukazimut
-          </Text>
+    <View className="w-full h-full px-4 my-6">
+      <Text className="text-2xl text-black text-semibold font-psemibold text-center">
+        YOU ARE ?
+      </Text>
 
-          <FormField 
-            title="Username"
-            value={form.username}
-            handleChangeText={(e) => setForm({ ...form, username: e })}
-            otherStyles="mt-7"
-          />
+      <CustomButton
+        title="Runner"
+        handlePress={() => {
+          router.push('/sign-up-runner');
+        }}
+        containerStyles="mt-7 h-32"
+      />
 
-          <FormField 
-            title="Email"
-            value={form.email}
-            handleChangeText={(e) => setForm({ ...form, email: e })}
-            otherStyles="mt-7"
-            keyboardType="email-address"
-          />
+      <CustomButton
+        title="Coach"
+        handlePress={() => {
+          router.push('/sign-up-coach');
+        }}
+        containerStyles="mt-7 h-32"
+      />
+    </View>
+  );
+};
 
-          <FormField 
-            title="Password"
-            value={form.password}
-            handleChangeText={(e) => setForm({ ...form, password: e })}
-            otherStyles="mt-7"
-          />
-
-          <CustomButton 
-            title="Sign Up"
-            handlePress={submit}
-            containerStyles="mt-7"
-            isLoading={isSubmitting}
-          />
-
-          <View className="justify-center pt-5 flex-row gap-2">
-            <Text className="text-lg text-black font-pregular">
-                Have an account already?
-            </Text>
-            <Link href="/sign-in" 
-            className="text-lg font-psemibold text-secondary">
-              Sign In
-            </Link>
-          </View>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  )
-}
-
-export default SignUp
+export default SignUp;

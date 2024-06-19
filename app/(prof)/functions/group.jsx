@@ -2,7 +2,7 @@ import IconButton from '../../../components/IconButton';
 import { icons } from '../../../constants';
 import CustomButton from '../../../components/CustomButton';
 import { Event, events, groups, maps } from '../data';
-import MapProf from '../map-prof';
+import { createGroup, fetchGroups } from '../../../utils/useAPI';
 
 import { router } from 'expo-router';
 import {
@@ -11,38 +11,26 @@ import {
   View,
   Modal,
   TouchableOpacity,
-  FlatList
+  FlatList,
+  Alert
 } from 'react-native';
 import RNPickerSelect from 'react-native-picker-select';
-import { useState } from 'react';
-import DatePicker from 'react-native-modern-datepicker';
-import { getToday, getFormatedDate } from 'react-native-modern-datepicker';
-import { useNavigation } from '@react-navigation/native';
+import { useState, useEffect } from 'react';
 
 const CreateNewGroup = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [groupName, setGroupName] = useState('');
   const [department, setDepartment] = useState('');
 
-  const navigation = useNavigation();
-
-  function handleReload() {
-    navigation.replace('tab-bar');
-  }
-
-  const handleCreateGroup = () => {
-    // Handle the creation of a new run here
+  const handleCreateGroup = async () => {
     setModalVisible(false);
-    const group = groupName + ' ' + department;
-    if (!groups.includes(group)) {
-      if (groupName && department) {
-        groups.push(groupName + ' ' + department);
-      }
-    } else {
-      alert('Group is already exit');
+    try {
+      if (groupName.length > 0 && department.length > 0) {
+        await createGroup(groupName, department);
+      } else Alert.alert('Error', 'Please choose group name and department');
+    } catch (error) {
+      console.error(error);
     }
-    // console.log(events);
-    // handleReload();
   };
 
   return (
@@ -88,7 +76,7 @@ const CreateNewGroup = () => {
                   }}
                   items={[
                     { label: 'STI', value: 'STI' },
-                    { label: 'MRI', value: 'TD2' }
+                    { label: 'MRI', value: 'MRI' }
                   ]}
                 />
               </View>

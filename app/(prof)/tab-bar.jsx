@@ -14,6 +14,7 @@ import {
 } from './functions/event';
 
 import { CreateNewGroup } from './functions/group';
+import GroupList from './functions/group-list';
 
 function Events() {
   return (
@@ -28,8 +29,9 @@ function Events() {
 
 function Groups() {
   return (
-    <View className="w-full h-full">
-      <View className="fixed top-full z-10">
+    <View className="relative w-full h-full">
+      <GroupList />
+      <View className="fixed bottom-0 z-2">
         <CreateNewGroup />
       </View>
     </View>

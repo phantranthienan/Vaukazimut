@@ -1,12 +1,17 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import { Stack } from 'expo-router';
+import React from 'react';
 
-const StuLayout = () => {
+const StudentLayout = () => {
   return (
-    <View>
-      <Text>StuLayout</Text>
-    </View>
-  )
-}
+    <Stack>
+      <Stack.Screen name="group-list" options={{ title: 'Groups' }} />
+      <Stack.Screen name="event-list" options={{ title: 'Events' }} />
+      <Stack.Screen
+        name="event-detail/[eventId]"
+        options={{ title: 'Event Detail' }}
+      />
+    </Stack>
+  );
+};
 
-export default StuLayout
+export default StudentLayout;
