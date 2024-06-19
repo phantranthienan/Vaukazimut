@@ -131,10 +131,8 @@ const CreateSession = ({ sessionName, sessionDate, map }) => {
 const CreateNewEvent = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [name, setName] = useState('');
-  const [publish, setPublish] = useState(false);
   const [groupRunner, setGroupRunner] = useState(groups[0]);
   const [showMap, setShowMap] = useState(false);
-  const [dummyState, setDummyState] = useState(0);
 
   const navigation = useNavigation();
 
@@ -199,9 +197,9 @@ const CreateNewEvent = () => {
               onPress={() => {
                 setShowMap(!showMap);
               }}
-              className="mt-4 bg-blue-500 p-2 rounded"
+              className="mt-4 bg-black p-2 rounded w-full"
             >
-              <Text className="text-white text-base font-">Create balises</Text>
+              <Text className="text-white text-base">Create balises</Text>
             </TouchableOpacity>
             <Modal
               animationType="slide"
@@ -216,7 +214,7 @@ const CreateNewEvent = () => {
                   handlePress={() => {
                     setShowMap(!showMap);
                   }}
-                  containerStyles="h-min m-0 bg-cyan-400"
+                  containerStyles="absolute h-min m-0 bg-black bottom-20"
                   textStyles="text-base font-thin"
                 ></CustomButton>
               </View>
@@ -224,15 +222,24 @@ const CreateNewEvent = () => {
 
             <TouchableOpacity
               onPress={handleCreateRun}
-              className="mt-4 bg-blue-500 p-2 rounded"
+              className="mt-4 bg-black p-2 rounded w-full"
             >
               <Text className="text-white text-base font-">Create Run</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => {
+                setModalVisible(!modalVisible);
+              }}
+              className="mt-4 bg-black p-2 rounded w-full"
+            >
+              <Text className="text-white text-base font-">Close</Text>
             </TouchableOpacity>
           </View>
         </View>
       </Modal>
 
-      <View className="absolute right-2 bottom-2 bg-white rounded-full p-2 flex-row justify-between mb-3 border-2 border-black">
+      <View className="absolute right-2 bottom-0 bg-white rounded-full p-2 flex-row justify-between mb-3 border-2 border-black">
         <IconButton
           icon={icons.add}
           handlePress={() => setModalVisible(true)}
@@ -269,35 +276,29 @@ function fixMap(name, addedMarkers) {
   );
 }
 const ShowEvents = () => {
-  // return Object.keys(events).map((eventName) => (
-  //   <TouchableOpacity className="flex-col h-fit w-full m-5 px-5 py-2 bg-cyan-100 rounded-xl shadow-lg">
-  //     <Text key={eventName} className="text-xl text-black font-semibold py">
-  //       {eventName}
-  //     </Text>
-  //     <IconButton
-  //       icon={icons.placeholder}
-  //       handlePress={() => {
-  //         fixMap({ eventName }, events[{ eventName }].location);
-  //         console.log({ eventName });
-  //       }}
-  //     ></IconButton>
-  //   </TouchableOpacity>
-  // ));
-
   return (
     <FlatList
       data={Object.keys(events)}
       keyExtractor={(eventName) => eventName}
       renderItem={({ item }) => (
-        <TouchableOpacity className="flex-row h-fit w-full m-5 px-5 py-2 bg-cyan-100 rounded-xl shadow-lg">
-          <Text className="text-xl text-black font-semibold py">{item}</Text>
-          <IconButton
-            containerStyles="aspect-square w-10 justify-items-end"
-            icon={icons.bookmark}
-            handlePress={() => {
-              fixMap(item, events[item]['location']);
-            }}
-          ></IconButton>
+        <TouchableOpacity className="flex flex-row h-fit mx-5 mb-5 p-5 bg-black rounded-xl shadow-lg">
+          <View className="basis-3/4">
+            <Text className="text-xl text-white font-semibold py">{item}</Text>
+          </View>
+          <View className="basis-1/4 flex flex-row">
+            <IconButton
+              containerStyles="aspect-square m-1"
+              icon={icons.bookmark}
+              handlePress={() => {
+                fixMap(item, events[item]['location']);
+              }}
+            ></IconButton>
+            <IconButton
+              containerStyles="aspect-square m-1"
+              icon={icons.bin}
+              handlePress={() => {}}
+            ></IconButton>
+          </View>
         </TouchableOpacity>
       )}
     />

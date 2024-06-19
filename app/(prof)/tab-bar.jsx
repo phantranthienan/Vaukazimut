@@ -8,12 +8,14 @@ import { Foundation, FontAwesome5 } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import {
   CreateNewRunBtn,
-  CreateSession,
+  CreateEvents,
   CreateNewEvent,
   ShowEvents
-} from './functions/session';
+} from './functions/event';
 
-function Session() {
+import { CreateNewGroup } from './functions/group';
+
+function Events() {
   return (
     <View className="relative w-full h-full">
       <ShowEvents />
@@ -24,42 +26,43 @@ function Session() {
   );
 }
 
-function Results() {
+function Groups() {
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Results!</Text>
+    <View className="w-full h-full">
+      <View className="fixed top-full z-10">
+        <CreateNewGroup />
+      </View>
     </View>
   );
 }
 
 const Tab = createBottomTabNavigator();
-
 const TabBar = () => {
   return (
     <Tab.Navigator
-      initialRouteName="Session"
+      initialRouteName="Events"
       screenOptions={{
         tabBarActiveTintColor: '#e91e63'
       }}
     >
       <Tab.Screen
-        name="Session"
-        component={Session}
+        name="Events"
+        component={Events}
         options={{
-          tabBarLabel: 'Session',
+          tabBarLabel: 'Events',
           tabBarIcon: ({ color, size }) => (
             <FontAwesome5 name="map-marked-alt" size={size} color={color} />
           )
         }}
       />
       <Tab.Screen
-        name="Results"
-        component={Results}
+        name="Groups"
+        component={Groups}
         options={{
-          tabBarLabel: 'Results',
+          tabBarLabel: 'Groups',
           tabBarIcon: ({ color, size }) => (
             <Foundation
-              name="results-demographics"
+              name="Groups-demographics"
               size={size + 5}
               color={color}
             />
