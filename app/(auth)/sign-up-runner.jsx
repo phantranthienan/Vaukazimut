@@ -32,6 +32,7 @@ const SignUpCoach = () => {
         form.department
       );
       setIsSubmitting(false);
+      router.push("/sign-in");
     }
   }, [isSubmitting, form]);
 
@@ -101,7 +102,7 @@ const SignUpCoach = () => {
         />
 
         <CustomButton
-          title="Sign Up"
+          title="Create Account"
           handlePress={submit}
           containerStyles="mt-5"
           isLoading={isSubmitting}

@@ -3,14 +3,11 @@ import { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Link, router } from "expo-router";
 
-import { images } from "../../constants";
 import CustomButton from "../../components/CustomButton";
 import FormField from "../../components/FormField";
 import { signIn } from "../../utils/useAPI";
-
-import { storeRole, storeToken, getRole, getToken } from "../../utils/handleAsyncStorage";
-
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { updateAxios } from "../../utils/useAPI";
+import { storeRole, storeToken, storeId, getId, getRole, getToken } from "../../utils/handleAsyncStorage";
 
 const SignIn = () => {
   const [form, setForm] = useState({
@@ -33,14 +30,18 @@ const SignIn = () => {
 
           const accessToken = res.data.data.accessToken;
           const role = res.data.data.role;
+          const id = res.data.data.user_id;
 
           await storeToken(accessToken);
           await storeRole(role);
+          await storeId(id);
+          
+          updateAxios();
 
           if (role === "Coach") {
             router.replace("/homeProf");
           } else {
-            router.replace("/homeStu");
+            router.replace("/group-list");
           }
         } 
       } catch (error) {
@@ -79,12 +80,12 @@ const SignIn = () => {
         isLoading={isSubmitting}
       />
 
-      <View className="justify-center pt-5 flex-row gap-2">
+      <View className="justify-center pt-5 flex-column items-center">
         <Text className="text-lg text-black font-pregular">
           Don't have an account?
         </Text>
-        <Link href="/sign-up" className="text-lg font-psemibold text-secondary">
-          Sign Up
+        <Link href="/sign-up" className="block text-lg font-psemibold text-secondary">
+          Create an account
         </Link>
       </View>
     </View>

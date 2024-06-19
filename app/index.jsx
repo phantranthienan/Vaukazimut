@@ -7,6 +7,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import CustomButton from "../components/CustomButton";
 import { images } from "../constants";
 import { getToken, getRole } from "../utils/handleAsyncStorage";
+import { updateAxios } from "../utils/useAPI";
 
 const Welcome = () => {
 
@@ -15,13 +16,12 @@ const Welcome = () => {
       try {
         const token = await getToken();
         const role = await getRole();
-
-        console.log(token, role);
         if (token && role) {
+          updateAxios();
           if (role === "Coach") {
             router.replace("/homeProf");
           } else if (role === "Runner") {
-            router.replace("/homeStu");
+            router.replace("/group-list");
           }
         } 
       } catch (error) {
@@ -54,14 +54,15 @@ const Welcome = () => {
 
           <CustomButton
             title="Continue"
-            containerStyles="mt-16"
+            textStyles="text-2xl"
+            containerStyles="mt-16 w-[50vw]"
             handlePress={() => {
                 router.push("/sign-in");
               }
             }
           />
 
-          {/* <CustomButton
+          <CustomButton
             title="go to map for prof"
             containerStyles="mt-16"
             handlePress={() => {
@@ -75,7 +76,7 @@ const Welcome = () => {
             handlePress={() => {
               router.push("/studentMap");
             }}
-          /> */}
+          />
         </View>
       </ScrollView>
     </SafeAreaView>
