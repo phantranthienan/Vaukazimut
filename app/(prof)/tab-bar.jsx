@@ -1,15 +1,25 @@
 import * as React from 'react';
+import { useState } from 'react';
 import { Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Foundation } from '@expo/vector-icons';
-import { FontAwesome5 } from '@expo/vector-icons';
+import { Foundation, FontAwesome5 } from '@expo/vector-icons';
+import { router } from 'expo-router';
+import {
+  CreateNewRunBtn,
+  CreateSession,
+  CreateNewEvent,
+  ShowEvents
+} from './functions/session';
 
 function Session() {
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Session!</Text>
+    <View className="relative w-full h-full">
+      <ShowEvents />
+      <View className="fixed bottom-0 z-10">
+        <CreateNewEvent />
+      </View>
     </View>
   );
 }
