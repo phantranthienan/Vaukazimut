@@ -13,7 +13,7 @@ import IconButton from '../../components/IconButton';
 import { icons } from '../../constants';
 import { Event, events, groups, maps } from './data';
 
-const MapProf = ({ name, addedMarkers }) => {
+const MapProf = ({ name, addedMarkers = NaN, createStartPoint = false }) => {
   const [region, setRegion] = useState(INSA_CVL);
   const [markers, setMarkers] = useState([]);
 
@@ -23,11 +23,15 @@ const MapProf = ({ name, addedMarkers }) => {
       setMarkers(addedMarkers);
     }
   }, [addedMarkers]);
-
   const addMarker = (coordinate) => {
-    setMarkers([...markers, coordinate]);
+    if (createStartPoint) {
+      if (markers.length === 0) {
+        setMarkers([coordinate]);
+      }
+    } else {
+      setMarkers([...markers, coordinate]);
+    }
   };
-
   return (
     <>
       <View style={styles.container}>

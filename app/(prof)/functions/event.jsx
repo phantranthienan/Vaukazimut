@@ -199,7 +199,7 @@ const CreateNewEvent = () => {
               }}
               className="mt-4 bg-black p-2 rounded w-full"
             >
-              <Text className="text-white text-base">Create balises</Text>
+              <Text className="text-white text-base">Create start point</Text>
             </TouchableOpacity>
             <Modal
               animationType="slide"
@@ -208,7 +208,7 @@ const CreateNewEvent = () => {
               onRequestClose={() => setShowMap(false)}
             >
               <View className="justify-center items-center my-2 h-full bg-white rounded-xl p-9 items-center shadow-lg w-max">
-                <MapProf name={name} />
+                <MapProf name={name} createStartPoint={true} />
                 <CustomButton
                   title="Close"
                   handlePress={() => {
