@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Alert, ScrollView, TouchableOpacity } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
-import { fetchEventDetail } from '../../../../utils/useAPI'; // Ensure this path is correct
+import { fetchCoachEvents, fetchEventDetail } from '../../../../utils/useAPI'; // Ensure this path is correct
 
 const EventDetail = () => {
   const { eventId } = useLocalSearchParams(); // Access the eventId from the query params
@@ -10,7 +10,7 @@ const EventDetail = () => {
   useEffect(() => {
     const getEventDetail = async () => {
       try {
-        const data = await fetchEventDetail(eventId);
+        const data = await fetchCoachEvents(eventId);
         setEvent(data);
       } catch (error) {
         console.error(error);
@@ -46,15 +46,15 @@ const EventDetail = () => {
           Group: {event.group_runner.name} {event.group_runner.department}
         </Text>
       </View>
-      <View className="p-4 w-[90vw] m-auto my-2 rounded-xl">
+      {/* <View className="p-4 w-[90vw] m-auto my-2 rounded-xl">
         <Text className="text-black font-pmedium text-2xl w-full text-center">
           {event.subtitle}
         </Text>
         <Text className="text-black font-pregular text-lg text-justify">
           {event.description}
         </Text>
-      </View>
-      <View className="w-[90vw] mx-auto my-2 rounded-xl items-center">
+      </View> */}
+      {/* <View className="w-[90vw] mx-auto my-2 rounded-xl items-center">
         <Text className="text-black font-pmedium text-2xl w-full text-center">
           Races
         </Text>
@@ -67,12 +67,11 @@ const EventDetail = () => {
           >
             <Text className="text-white text-2xl font-pbold">{race.name}</Text>
             <Text className="text-white font-plight text-lg">
-              {' '}
-              {race.time_limit}{' '}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+              {race.time_limit}
+            </Text> */}
+      {/* </TouchableOpacity> */}
+      {/* ))} */}
+      {/* </View> */}
     </ScrollView>
   );
 };

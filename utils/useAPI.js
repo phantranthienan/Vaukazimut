@@ -3,7 +3,8 @@ import { Alert } from 'react-native';
 import { getId, getToken, clearStorage } from './handleAsyncStorage';
 
 const apiSource = axios.create({
-  baseURL: 'https://project-programmation-version2.vercel.app/api'
+  // baseURL: 'https://project-programmation-version2.vercel.app/api'
+  baseURL: 'http://10.0.2.2:8000/api'
 });
 
 const updateAxios = () => {
@@ -20,6 +21,8 @@ const updateAxios = () => {
     }
   );
 };
+
+// For log in, log out, sign up
 
 const signUp = async (
   username,
@@ -92,6 +95,8 @@ const logOut = async () => {
   }
 };
 
+// Handle group and event
+
 const fetchGroups = async () => {
   try {
     const response = await apiSource.get('/group-runners-coach/');
@@ -153,56 +158,105 @@ const fetchEventDetail = async (eventId) => {
   }
 };
 
-const createEvent = async ({
+const fetchCoachEvents = async () => {
+  try {
+    const res = await apiSource.get('/events-coach/');
+    return res.data;
+  } catch (err) {
+    console.error("Error fetching Coach's detail", err);
+  }
+};
+
+const createEvent = async (
   name,
   start,
   end,
   location_id,
-  coach_id,
   group_runner_id,
   department
-}) => {
+) => {
+  id = await getId();
+  id = parseInt(id);
+
   try {
     let req = {
       name: name,
       start: start,
       end: end,
       location_id: location_id,
-      coach_id: coach_id,
+      coach_id: id,
       group_runner_id: group_runner_id,
       department: department
     };
-    const res = await apiSource.post('/auth/events-coach/', req);
+    const res = await apiSource.post('/events-coach/', req);
+    const token = await getToken();
+    console.log(token);
     // console.log(res.data);
     return res;
   } catch (err) {
-    console.log(err.response.data);
-    if (err.response.data) {
-      Alert.alert(err.response.data.message);
-    } else {
-      Alert.alert('An unexpected error occurred.');
-    }
-    console.error(err);
+    console.log('Error creating event details:', err);
   }
 };
 
-const fetchAllEvents = async () => {
+// Handle map student
+
+const fetchRaceDetails = async (raceId) => {
   try {
-    const res = await apiSource.get('/group-runners-coach/');
+    const res = await apiSource.get(`/race-runner/${raceId}/`);
     return res.data;
   } catch (err) {
-    console.error('Error fetching all events:', err);
+    console.error('Error fetching race details:', err);
   }
 };
 
-const createStartPoint = async ({ name, latitude, longitude }) => {
+const recordCheckpoint = async (number, longitude, latitude, id) => {
+  console.log(id);
+  let body = {
+    number: number,
+    longitude: longitude,
+    latitude: latitude,
+    race_runner_id: id
+  };
+  try {
+    const res = await apiSource.post('/record-checkpoint/', body);
+    console.log('Sucess', res.data);
+    return res.data;
+  } catch (err) {
+    console.log('Error recording checkpoint', err.response.data);
+    Alert.alert(err.response.data.message);
+  }
+};
+
+const startRace = async (raceId) => {
+  try {
+    const res = await apiSource.post(`/start-race/`, { race_id: raceId });
+    return res.data;
+  } catch (err) {
+    console.error('Error starting race:', err);
+  }
+};
+
+const terminateRace = async (id, total_time) => {
+  let body = {
+    race_runner_id: id,
+    total_time: total_time
+  };
+  try {
+    const res = await apiSource.post('/end-race-runner/', body);
+    return res.data;
+  } catch (err) {
+    console.error('Error terminating race:', err);
+  }
+};
+
+const createStartPoint = async (name, latitude, longitude) => {
   try {
     let req = {
       name: name,
       latitude: latitude,
       longitude: longitude
     };
-    const res = await apiSource.post('/locations', req);
+    const res = await apiSource.post('/locations/', req);
     // console.log(res.data);
     return res;
   } catch (err) {
@@ -221,12 +275,16 @@ export {
   signIn,
   logOut,
   updateAxios,
-  createGroup,
   fetchGroups,
   joinGroup,
   fetchMyEvents,
   fetchEventDetail,
+  fetchCoachEvents,
+  fetchRaceDetails,
+  recordCheckpoint,
+  terminateRace,
+  startRace,
+  createStartPoint,
   createEvent,
-  fetchAllEvents,
-  createStartPoint
+  createGroup
 };

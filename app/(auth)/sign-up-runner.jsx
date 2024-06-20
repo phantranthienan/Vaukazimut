@@ -52,8 +52,8 @@ const SignUpCoach = () => {
 
   return (
     <ScrollView>
-      <View className="w-full h-full px-4 my-6">
-        <Text className="text-2xl text-black text-semibold font-psemibold text-center">
+      <View className="mb-6 w-full h-full px-4 bg-primary-emerald">
+        <Text className="text-4xl mt-8 text-black text-semibold font-psemibold text-center">
           Sign up to Vaukazimut
         </Text>
 
@@ -104,11 +104,12 @@ const SignUpCoach = () => {
         <CustomButton
           title="Create Account"
           handlePress={submit}
-          containerStyles="mt-5"
+          containerStyles="mt-7 bg-black w-full"
           isLoading={isSubmitting}
+          textStyles="text-2xl"
         />
 
-        <View className="justify-center pt-5 flex-row gap-2">
+        <View className="justify-center pt-5 flex-row gap-2 ">
           <Text className="text-lg text-black font-pregular">
             Have an account already?
           </Text>

@@ -18,6 +18,7 @@ import balise from "../assets/icons/balise.png";
 import check from "../assets/icons/check.png";
 import start from "../assets/icons/start.png";
 import clean from "../assets/icons/clean.png";
+import pin from "../assets/icons/pin.png";
 
 export default {
   play,
@@ -39,5 +40,6 @@ export default {
   balise,
   check,
   start,
-  clean
+  clean,
+  pin
 };

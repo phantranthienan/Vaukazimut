@@ -3,28 +3,34 @@ import {
   Text,
   Image,
   StyleSheet,
-  Button,
   Alert,
   Modal,
   TextInput,
-  TouchableOpacity
-} from 'react-native';
-import MapView, { PROVIDER_GOOGLE, Marker, Circle } from 'react-native-maps';
-import React, { useState, useEffect, useRef } from 'react';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import * as Location from 'expo-location';
+  TouchableOpacity,
+  ActivityIndicator,
+  BackHandler
+} from "react-native";
+import MapView, { PROVIDER_GOOGLE, Marker, Circle } from "react-native-maps";
+import React, { useState, useEffect, useRef } from "react";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import * as Location from "expo-location";
 
-import { INSA_CVL, MAP_STYLE } from '../constants/map';
-import { icons } from '../constants';
+import { INSA_CVL, MAP_STYLE } from "../../../../constants/map";
+import { icons } from "../../../../constants";
 import {
   fetchRaceDetails,
   recordCheckpoint,
   terminateRace,
-  startRace
-} from '../utils/useAPI';
+  startRace,
+} from "../../../../utils/useAPI";
+import { getId } from "../../../../utils/handleAsyncStorage";
 
 const StudentMap = () => {
+
   const { raceId } = useLocalSearchParams();
+  //******************************************************/
+  //******************** USE STATE ***********************/
+  //******************************************************/
   const [region, setRegion] = useState(INSA_CVL);
   const [userLocation, setUserLocation] = useState(null);
   const [markers, setMarkers] = useState([]);
@@ -34,71 +40,36 @@ const StudentMap = () => {
   const [isTerminated, setIsTerminated] = useState(false);
   const [time, setTime] = useState(0);
   const timerRef = useRef(null);
+  const [isLoading, setIsLoading] = useState(true); // Add loading state
 
   const [validatedBalises, setValidatedBalises] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
-  const [baliseInput, setBaliseInput] = useState('');
+  const [baliseInput, setBaliseInput] = useState("");
 
   const [raceRunnerId, setRaceRunnerId] = useState(null);
 
-  // Array of markers with number, points, and location (latitude, longitude)
-  //   const markers = [
-  //     {
-  //       number: 1,
-  //       point: 10,
-  //       latitude: 47.082353,
-  //       longitude: 2.415264,
-  //     },
-  //     {
-  //       number: 2,
-  //       point: 20,
-  //       latitude: 47.081773,
-  //       longitude: 2.416305,
-  //     },
-  //     {
-  //       number: 3,
-  //       point: 30,
-  //       latitude: 47.081642,
-  //       longitude: 2.415474,
-  //     },
-  //   ];
-
+  //******************************************************/
+  //******************** USE EFFECT ***********************/
+  //******************************************************/
   useEffect(() => {
-    const getRaceDetails = async () => {
-      try {
-        const raceData = await fetchRaceDetails(raceId);
-        setMarkers(raceData.checkpoints);
-        setTimeLimit(raceData.time_limit);
-      } catch (err) {
-        console.error(err);
-        Alert.alert(
-          'Error',
-          'Failed to fetch race details. Please try again later.'
-        );
-      }
-    };
-
     if (raceId) {
       getRaceDetails();
     }
   }, [raceId]);
 
-  // Request location permissions and get the initial location
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        console.error('Permission to access location was denied');
-        console.log('Please enable location services and restart the app.');
+      if (status !== "granted") {
+        console.error("Permission to access location was denied");
+        console.log("Please enable location services and restart the app.");
         return;
       }
 
-      let location = await Location.getCurrentPositionAsync({});
-      setUserLocation(location.coords);
+      const location = await getCurrentLocation();
+      setUserLocation(location);
     })();
   }, []);
-
-  console.log('User location:', userLocation);
 
   // Manage the timer
   useEffect(() => {
@@ -117,16 +88,61 @@ const StudentMap = () => {
     };
   }, [isStarted]);
 
-  console.log('race_id:', raceId);
+  useEffect(() => {
+    const backAction = () => {
+      if (isStarted && !isTerminated) {
+        Alert.alert("Hold on!", "You cannot go back until you terminate the race.", [
+          { text: "OK" }
+        ]);
+        return true;
+      }
+      return false;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+
+    return () => backHandler.remove();
+  }, [isStarted, isTerminated]);
+
+  //******************************************************/
+  //******************** SOME FUNCTION ***********************/
+  //******************************************************/
+
+  const getRaceDetails = async () => {
+    try {
+      setIsLoading(true); // Start loading
+      const raceData = await fetchRaceDetails(raceId);
+      setMarkers(raceData.checkpoints);
+      setTimeLimit(raceData.time_limit);
+    } catch (err) {
+      console.error(err);
+      Alert.alert(
+        "Error",
+        "Failed to fetch race details. Please try again later."
+      );
+    } finally {
+      setIsLoading(false); // Stop loading
+    }
+  };
+
+  // Get the user's location
+  const getCurrentLocation = async () => {
+    let location = await Location.getCurrentPositionAsync({});
+    return location.coords;
+  };
 
   // Start the timer
   const startTimer = async () => {
     try {
       const raceRunner = await startRace(raceId);
-      setRaceRunnerId(raceRunner.race_id);
+      console.log(raceRunner);
+      setRaceRunnerId(raceRunner.data.id);
       setIsStarted(true);
     } catch (err) {
-      Alert.alert('Error', 'Failed to start race. Please try again.');
+      Alert.alert("Error", "Failed to start race. Please try again.");
     }
   };
 
@@ -136,9 +152,9 @@ const StudentMap = () => {
     setIsTerminated(true);
     try {
       await terminateRace(raceRunnerId, time);
-      Alert.alert('Race Ended');
+      Alert.alert("Race Ended", "You can now navigate back.");
     } catch (err) {
-      Alert.alert('Error', 'Failed to end race, please try again.');
+      Alert.alert("Error", "Failed to end race, please try again.");
     }
   };
 
@@ -158,12 +174,12 @@ const StudentMap = () => {
         setValidatedBalises([...validatedBalises, number]);
         setModalVisible(false);
       } catch (error) {
-        Alert.alert('Error', 'Failed to record checkpoint. Please try again.');
+        Alert.alert("Error", "Failed to record checkpoint. Please try again.");
       }
     } else {
       Alert.alert(
-        'Invalid Balise',
-        'The balise number entered is invalid or already validated.'
+        "Invalid Balise",
+        "The balise number entered is invalid or already validated."
       );
     }
   };
@@ -171,70 +187,75 @@ const StudentMap = () => {
   return (
     <>
       <View style={styles.container}>
-        <MapView
-          showsUserLocation={true}
-          paddingAdjustmentBehavior="never"
-          style={styles.map}
-          provider={PROVIDER_GOOGLE}
-          customMapStyle={MAP_STYLE}
-          initialRegion={region}
-          region={region}
-          onRegionChangeComplete={(newRegion, gesture) => {
-            if (!gesture.isGesture) {
-              return;
-            }
-            setRegion(newRegion);
-          }}
-        >
-          {markers.map((marker, index) => {
-            const isValidated = validatedBalises.includes(marker.number);
-            return (
-              <React.Fragment key={index}>
-                <Marker
-                  coordinate={{
-                    latitude: marker.latitude,
-                    longitude: marker.longitude
-                  }}
-                  title={`Balise ${marker.number}`}
-                  description={`${marker.point} points`}
-                >
-                  <View style={styles.marker}>
-                    <Text
-                      style={
-                        isValidated
-                          ? styles.validatedMarkerText
-                          : styles.markerText
-                      }
-                    >
-                      {marker.number}
-                    </Text>
-                    <Image
-                      source={icons.balise}
-                      style={
-                        isValidated
-                          ? styles.validatedMarkerImage
-                          : styles.markerImage
-                      }
-                    />
-                  </View>
-                </Marker>
-                <Circle
-                  center={{
-                    latitude: marker.latitude,
-                    longitude: marker.longitude
-                  }}
-                  radius={5} // radius in meters
-                  strokeColor={
-                    isValidated ? 'rgba(0,255,0,0.5)' : 'rgba(0,0,255,0.5)'
-                  }
-                  fillColor={
-                    isValidated ? 'rgba(0,255,0,0.1)' : 'rgba(0,0,255,0.1)'
-                  }
-                />
-              </React.Fragment>
-            );
-          })}
-        </MapView>
+        {isLoading ? (
+          <ActivityIndicator size="large" color="#0000ff" />
+        ) : (
+          <MapView
+            showsUserLocation={true}
+            paddingAdjustmentBehavior="never"
+            style={styles.map}
+            provider={PROVIDER_GOOGLE}
+            customMapStyle={MAP_STYLE}
+            initialRegion={region}
+            region={region}
+            onRegionChangeComplete={(newRegion, gesture) => {
+              if (!gesture.isGesture) {
+                return;
+              }
+              setRegion(newRegion);
+            }}
+          >
+            {markers.map((marker, index) => {
+              location = {
+                latitude: marker.latitude,
+                longitude: marker.longitude,
+              }
+              const isValidated = validatedBalises.includes(marker.number);
+              return (
+                <React.Fragment key={marker.id}>
+                  <Marker
+                    coordinate={location}
+                    title={`Balise ${marker.number}`}
+                    description={`${marker.score} points`}
+                  >
+                    <View style={styles.marker}>
+                      <Text
+                        style={
+                          isValidated
+                            ? styles.validatedMarkerText
+                            : styles.markerText
+                        }
+                      >
+                        {marker.number}
+                      </Text>
+                      <Image
+                        source={icons.pin}
+                        style={
+                          isValidated
+                            ? styles.validatedMarkerImage
+                            : styles.markerImage
+                        }
+                      />
+                    </View>
+                  </Marker>
+                  <Circle
+                    center={{
+                      latitude: marker.latitude,
+                      longitude: marker.longitude,
+                    }}
+                    radius={5} // radius in meters
+                    strokeColor={
+                      isValidated ? "rgba(0,255,0,0.5)" : "rgba(0,0,255,0.5)"
+                    }
+                    fillColor={
+                      isValidated ? "rgba(0,255,0,0.1)" : "rgba(0,0,255,0.1)"
+                    }
+                  />
+                </React.Fragment>
+              );
+            })}
+          </MapView>
+        )}
 
         <View style={styles.buttons}>
           {!isStarted && !isTerminated && (
@@ -331,101 +352,101 @@ const StudentMap = () => {
 const styles = StyleSheet.create({
   container: {
     ...StyleSheet.absoluteFillObject,
-    justifyContent: 'flex-end',
-    alignItems: 'center'
+    justifyContent: "flex-end",
+    alignItems: "center",
   },
   map: {
-    ...StyleSheet.absoluteFillObject
+    ...StyleSheet.absoluteFillObject,
   },
   marker: {
-    alignItems: 'center',
-    justifyContent: 'center'
+    alignItems: "center",
+    justifyContent: "center",
   },
   markerText: {
-    color: 'black',
-    fontWeight: 'bold',
-    fontSize: 16
+    color: "black",
+    fontWeight: "bold",
+    fontSize: 16,
   },
   validatedMarkerText: {
-    color: 'green',
-    fontWeight: 'bold',
-    fontSize: 16
+    color: "green",
+    fontWeight: "bold",
+    fontSize: 16,
   },
   markerImage: {
     width: 32,
-    height: 32
+    height: 32,
   },
   validatedMarkerImage: {
     width: 32,
     height: 32,
-    tintColor: 'green'
+    tintColor: "green",
   },
   buttons: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 75,
     left: 0,
     right: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
     marginLeft: 20,
-    marginRight: 20
+    marginRight: 20,
   },
   timer: {
-    position: 'absolute',
+    position: "absolute",
     top: 75,
     left: 0,
     right: 0,
-    justifyContent: 'center',
-    alignItems: 'center'
+    justifyContent: "center",
+    alignItems: "center",
   },
   summary: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 100,
     left: 0,
     right: 0,
-    justifyContent: 'center',
-    alignItems: 'center'
+    justifyContent: "center",
+    alignItems: "center",
   },
   summaryText: {
     fontSize: 18,
-    fontWeight: 'bold'
+    fontWeight: "bold",
   },
   modalContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)'
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
   modalView: {
     width: 300,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 20,
     padding: 20,
-    alignItems: 'center',
-    shadowColor: '#000',
+    alignItems: "center",
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
-      height: 2
+      height: 2,
     },
     shadowOpacity: 0.25,
     shadowRadius: 4,
-    elevation: 5
+    elevation: 5,
   },
   modalText: {
     marginBottom: 15,
-    textAlign: 'center',
+    textAlign: "center",
     fontSize: 18,
-    fontWeight: 'bold'
+    fontWeight: "bold",
   },
   input: {
-    width: '100%',
+    width: "100%",
     height: 40,
-    borderColor: 'gray',
+    borderColor: "gray",
     borderWidth: 1,
     marginBottom: 15,
-    paddingLeft: 10
-  }
+    paddingLeft: 10,
+  },
 });
 
 export default StudentMap;

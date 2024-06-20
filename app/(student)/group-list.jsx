@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Alert,
+  RefreshControl,
+  ScrollView
+} from 'react-native';
 import { router } from 'expo-router';
 
 import CustomButton from '../../components/CustomButton';
@@ -9,21 +16,27 @@ import {
   updateAxios,
   joinGroup
 } from '../../utils/useAPI';
-import { clearStorage } from '../../utils/handleAsyncStorage';
 
 const GroupList = () => {
   const [groups, setGroups] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await getGroups();
+    setRefreshing(false);
+  };
+
+  const getGroups = async () => {
+    try {
+      const data = await fetchGroups();
+      setGroups(data.results);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   useEffect(() => {
-    const getGroups = async () => {
-      try {
-        const data = await fetchGroups();
-        setGroups(data.results);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
     getGroups();
   }, []);
 
@@ -37,50 +50,34 @@ const GroupList = () => {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      await logOut();
-      await clearStorage();
-      updateAxios();
-      router.replace('/');
-    } catch (error) {
-      console.error('Error logging out:', error);
-      Alert.alert('Error', 'Something went wrong. Please try again.');
-    }
-  };
-
   if (groups.length === 0) {
     return (
       <View className="h-full items-center justify-center">
         <Text>No group available...</Text>
-        <TouchableOpacity onPress={handleLogout}>
-          <Text style={{ color: 'blue', textDecorationLine: 'underline' }}>
-            Log out
-          </Text>
-        </TouchableOpacity>
       </View>
     );
   }
 
   return (
-    <View className="h-full items-center justify-center">
-      <Text className="font-pbold text-3xl my-8">CHOOSE YOUR GROUP</Text>
-      {groups.map((group) => (
-        <View key={group.id}>
-          <CustomButton
-            title={`${group.name} ${group.department}`}
-            handlePress={() => handleJoinGroup(group.id)}
-            containerStyles="w-[85vw] my-4"
-          />
-        </View>
-      ))}
-      <CustomButton
-        title="Log out"
-        handlePress={() => {
-          handleLogout();
-        }}
-      />
-    </View>
+    <ScrollView
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
+      <View className="h-[100vh] items-center bg-primary-emerald">
+        <Text className="text-white font-pbold text-4xl mt-8 mb-4">GROUP</Text>
+        {groups.map((group) => (
+          <View key={group.id}>
+            <CustomButton
+              title={`${group.name} ${group.department}`}
+              handlePress={() => handleJoinGroup(group.id)}
+              containerStyles="w-[85vw] my-4 h-[10vh] bg-primary-jungle"
+              textStyles="text-2xl"
+            />
+          </View>
+        ))}
+      </View>
+    </ScrollView>
   );
 };
 

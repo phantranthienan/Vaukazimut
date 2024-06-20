@@ -45,6 +45,7 @@ const CreateNewEvent = () => {
   const [groupRunner, setGroupRunner] = useState();
 
   const [startPointName, setStartPointName] = useState('');
+  const [startPointId, setStartPointId] = useState(0);
   const [showMap, setShowMap] = useState(false);
 
   useEffect(() => {
@@ -56,7 +57,6 @@ const CreateNewEvent = () => {
         // console.log(data.results[0].department);
         setGroups(groupsData);
         // console.log('In group');
-        console.log(groups);
       } catch (error) {
         console.error(error);
       }
@@ -64,8 +64,6 @@ const CreateNewEvent = () => {
 
     getGroups();
   }, [fetchGroups, setGroups]);
-
-  console.log('outside Effect' + groups);
 
   const formatDateTime = (date) => {
     const day = String(date.getDate()).padStart(2, '0');
@@ -87,23 +85,47 @@ const CreateNewEvent = () => {
           startPoint.latitude,
           startPoint.longitude
         );
+        setStartPointId(res.data.id);
+        // setStartPointId(res.)
       } else Alert.alert('Error', 'No start point founded');
     } catch (error) {
       console.error(error);
     }
   };
 
-  const handleCreateRun = () => {
-    // Handle the creation of a new run here
-    setModalVisible(false);
-    setShowStart(false);
-    setShowStartDate(false);
-    setShowStartTime(false);
-    setShowEnd(false);
-    setShowEndDate(false);
-    setShowEndTime(false);
+  // const handleCreateRun = () => {
+  //   setModalVisible(false);
+  //   setShowStart(false);
+  //   setShowStartDate(false);
+  //   setShowStartTime(false);
+  //   setShowEnd(false);
+  //   setShowEndDate(false);
+  //   setShowEndTime(false);
 
-    setShowMap(false);
+  //   setShowMap(false);
+  // };
+  const handleCreateRun = async () => {
+    try {
+      // Handle the creation of a new run here
+      setModalVisible(false);
+      setShowStart(false);
+      setShowStartDate(false);
+      setShowStartTime(false);
+      setShowEnd(false);
+      setShowEndDate(false);
+      setShowEndTime(false);
+
+      setShowMap(false);
+      await createEvent(
+        name,
+        formatDateTime(start),
+        formatDateTime(end),
+        startPointId,
+        groupRunner
+      );
+    } catch (e) {
+      console.log('Create an event failed: ', e);
+    }
   };
 
   const onChangeStartDate = (e, selectedDate) => {
@@ -368,35 +390,34 @@ const CreateSession = ({ sessionName, sessionDate, map }) => {
   );
 };
 
-const ShowEvents = () => {
-  return (
-    <FlatList
-      data={Object.keys(events)}
-      keyExtractor={(eventName) => eventName}
-      renderItem={({ item }) => (
-        <TouchableOpacity className="flex flex-row h-fit mx-5 mb-5 p-5 bg-black rounded-xl shadow-lg">
-          <View className="basis-3/4">
-            <Text className="text-xl text-white font-semibold py">{item}</Text>
-          </View>
-          <View className="basis-1/4 flex flex-row">
-            <IconButton
-              containerStyles="aspect-square m-1"
-              icon={icons.bookmark}
-              handlePress={() => {
-                fixMap(item, events[item]['location']);
-              }}
-            ></IconButton>
-            <IconButton
-              containerStyles="aspect-square m-1"
-              icon={icons.bin}
-              handlePress={() => {}}
-            ></IconButton>
-          </View>
-        </TouchableOpacity>
-      )}
-    />
-  );
-};
+// const ShowEvents = () => {
+//   return (
+//     <FlatList
+//       data={Object.keys(events)}
+//       keyExtractor={(eventName) => eventName}
+//       renderItem={({ item }) => (
+//         <TouchableOpacity className="flex flex-row h-fit mx-5 mb-5 p-5 bg-black rounded-xl shadow-lg">
+//           <View className="basis-3/4">
+//             <Text className="text-xl text-white font-semibold py">{item}</Text>
+//           </View>
+//           <View className="basis-1/4 flex flex-row">
+//             <IconButton
+//               containerStyles="aspect-square m-1"
+//               icon={icons.bookmark}
+//               handlePress={() => {
+//                 fixMap(item, events[item]['location']);
+//               }}
+//             ></IconButton>
+//             <IconButton
+//               containerStyles="aspect-square m-1"
+//               icon={icons.bin}
+//               handlePress={() => {}}
+//             ></IconButton>
+//           </View>
+//         </TouchableOpacity>
+//       )}
+//     />
+//   );
+// };
 
 export default CreateNewEvent;
-export { CreateNewEvent, ShowEvents };

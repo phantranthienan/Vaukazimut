@@ -6,22 +6,17 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Foundation, FontAwesome5 } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import {
-  CreateNewRunBtn,
-  CreateEvents,
-  CreateNewEvent,
-  ShowEvents
-
-} from './functions/event';
+import CreateNewEvent from './functions/event';
 
 import { CreateNewGroup } from './functions/group';
 import GroupList from './functions/group-list';
+import EventList from './functions/event-list';
 import { ScrollView } from 'react-native-web';
 
 function Events() {
   return (
     <View className="relative w-full h-full">
-      <ShowEvents />
+      <EventList />
       <View className="absolute w-full h-full z-10">
         <CreateNewEvent />
       </View>

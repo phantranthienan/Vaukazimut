@@ -25,16 +25,14 @@ const GroupList = () => {
     const getGroups = async () => {
       try {
         const data = await fetchGroups();
-        console.log(data);
         setGroups(data.results);
-        console.log('In group' + groups);
       } catch (error) {
         console.error(error);
       }
     };
 
     getGroups();
-  }, []);
+  }, [fetchGroups, setGroups]);
 
   if (groups.length === 0) {
     return (
@@ -53,7 +51,7 @@ const GroupList = () => {
             <CustomButton
               title={`${group.name} ${group.department}`}
               handlePress={() => {}}
-              containerStyles="w-[85vw] my-4"
+              containerStyles="w-[85vw] my-4 bg-black"
             />
           </View>
         ))}
