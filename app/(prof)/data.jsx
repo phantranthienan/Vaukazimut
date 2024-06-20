@@ -17,6 +17,7 @@ const Event = ({
 
 let events = {};
 let groups = ['Group 1', 'Group 2'];
-let maps = {};
+let startPointList = {};
+let balises = {};
 
-export { Event, events, groups, maps };
+export { Event, events, groups, startPointList, balises };

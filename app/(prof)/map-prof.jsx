@@ -11,7 +11,7 @@ import React, { useState, useEffect } from 'react';
 
 import IconButton from '../../components/IconButton';
 import { icons } from '../../constants';
-import { Event, events, groups, maps } from './data';
+import { Event, events, groups, maps, startPointList } from './data';
 
 const MapProf = ({ name, addedMarkers = NaN, createStartPoint = false }) => {
   const [region, setRegion] = useState(INSA_CVL);
@@ -40,7 +40,7 @@ const MapProf = ({ name, addedMarkers = NaN, createStartPoint = false }) => {
         <MapView
           paddingAdjustmentBehavior="never"
           style={styles.map}
-          prorvider={PROVIDER_GOOGLE}
+          provider={PROVIDER_GOOGLE}
           customMapStyle={MAP_STYLE}
           initialRegion={region}
           region={region}
@@ -50,16 +50,24 @@ const MapProf = ({ name, addedMarkers = NaN, createStartPoint = false }) => {
             }
             setRegion(newRegion);
           }}
-          onPress={(e) => addMarker(e.nativeEvent.coordinate)}
+          onPress={(e) => {
+            addMarker(e.nativeEvent.coordinate);
+          }}
         >
           {markers.map((marker, index) => (
             <React.Fragment key={index}>
               <Marker coordinate={marker}>
                 <View className="items-center justify-center pl-5">
-                  <Text className="text-black font-psemibold text-xl">
-                    {index + 1}
-                  </Text>
-                  <Image source={icons.balise} className="w-8 h-8" />
+                  {!createStartPoint && (
+                    // This line is incorrect and needs correction
+                    <Text className="text-black font-psemibold text-xl">
+                      {index + 1}
+                    </Text>
+                  )}
+                  <Image
+                    source={createStartPoint ? icons.home : icons.balise}
+                    className="w-8 h-8"
+                  />
                 </View>
               </Marker>
               <Circle
@@ -92,10 +100,13 @@ const MapProf = ({ name, addedMarkers = NaN, createStartPoint = false }) => {
           <IconButton
             icon={icons.check}
             handlePress={() => {
-              console.log(markers);
-              maps[name] = markers;
-              console.log(maps[name]);
-              console.log(maps);
+              // console.log(markers);
+              startPointList[name] = {
+                name: name,
+                latitude: markers[0]['latitude'],
+                longitude: markers[0]['longitude']
+              };
+              // console.log(startPoint[name]);
             }}
           />
         </View>

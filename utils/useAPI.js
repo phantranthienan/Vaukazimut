@@ -195,6 +195,27 @@ const fetchAllEvents = async () => {
   }
 };
 
+const createStartPoint = async ({ name, latitude, longitude }) => {
+  try {
+    let req = {
+      name: name,
+      latitude: latitude,
+      longitude: longitude
+    };
+    const res = await apiSource.post('/locations', req);
+    // console.log(res.data);
+    return res;
+  } catch (err) {
+    console.log(err.response.data);
+    if (err.response.data) {
+      Alert.alert(err.response.data.message);
+    } else {
+      Alert.alert('An unexpected error occurred.');
+    }
+    console.error(err);
+  }
+};
+
 export {
   signUp,
   signIn,
@@ -206,5 +227,6 @@ export {
   fetchMyEvents,
   fetchEventDetail,
   createEvent,
-  fetchAllEvents
+  fetchAllEvents,
+  createStartPoint
 };

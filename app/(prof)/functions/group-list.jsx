@@ -25,8 +25,9 @@ const GroupList = () => {
     const getGroups = async () => {
       try {
         const data = await fetchGroups();
+        console.log(data);
         setGroups(data.results);
-        console.log("In group" + groups);
+        console.log('In group' + groups);
       } catch (error) {
         console.error(error);
       }
