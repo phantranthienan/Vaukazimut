@@ -52,7 +52,7 @@ const SignUpCoach = () => {
 
   return (
     <ScrollView>
-      <View className="w-full h-full px-4 bg-primary-emerald">
+      <View className="mb-6 w-full h-full px-4 bg-primary-emerald">
         <Text className="text-4xl mt-8 text-black text-semibold font-psemibold text-center">
           Sign up to Vaukazimut
         </Text>

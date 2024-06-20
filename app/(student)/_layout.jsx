@@ -57,6 +57,10 @@ const StudentLayout = () => {
           ),
         }}
       />
+      <Stack.Screen
+        name="event-detail/map-race/[raceId]"
+        options={{headerShown: false}}
+      />
     </Stack>
   );
 };

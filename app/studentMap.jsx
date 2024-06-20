@@ -1,15 +1,21 @@
 import { View, Text, Image, StyleSheet, Button, Alert, Modal, TextInput, TouchableOpacity } from "react-native";
 import MapView, { PROVIDER_GOOGLE, Marker, Circle } from "react-native-maps";
 import React, { useState, useEffect, useRef } from "react";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import * as Location from "expo-location";
+
 
 import { INSA_CVL, MAP_STYLE } from "../constants/map";
 import { icons } from "../constants";
+import { fetchRaceDetails, recordCheckpoint, terminateRace, startRace } from "../utils/useAPI";
 
 const StudentMap = () => {
+    const { raceId } = useLocalSearchParams();
   const [region, setRegion] = useState(INSA_CVL);
   const [userLocation, setUserLocation] = useState(null);
+  const [markers, setMarkers] = useState([]);
 
+  const [timeLimit, setTimeLimit] = useState(0);
   const [isStarted, setIsStarted] = useState(false);
   const [isTerminated, setIsTerminated] = useState(false);
   const [time, setTime] = useState(0);
@@ -19,27 +25,46 @@ const StudentMap = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [baliseInput, setBaliseInput] = useState('');
 
-  // Array of markers with number, points, and location (latitude, longitude)
-  const markers = [
-    {
-      number: 1,
-      point: 10,
-      latitude: 47.082353,
-      longitude: 2.415264,
-    },
-    {
-      number: 2,
-      point: 20,
-      latitude: 47.081773,
-      longitude: 2.416305,
-    },
-    {
-      number: 3,
-      point: 30,
-      latitude: 47.081642,
-      longitude: 2.415474,
-    },
-  ];
+  const [raceRunnerId, setRaceRunnerId] = useState(null);
+
+// Array of markers with number, points, and location (latitude, longitude)
+//   const markers = [
+//     {
+//       number: 1,
+//       point: 10,
+//       latitude: 47.082353,
+//       longitude: 2.415264,
+//     },
+//     {
+//       number: 2,
+//       point: 20,
+//       latitude: 47.081773,
+//       longitude: 2.416305,
+//     },
+//     {
+//       number: 3,
+//       point: 30,
+//       latitude: 47.081642,
+//       longitude: 2.415474,
+//     },
+//   ];
+
+    useEffect(() => {
+        const getRaceDetails = async () => {
+            try {
+                const raceData = await fetchRaceDetails(raceId);
+                setMarkers(raceData.checkpoints);
+                setTimeLimit(raceData.time_limit);
+            } catch (err) {
+                console.error(err);
+                Alert.alert("Error", "Failed to fetch race details. Please try again later."); 
+            }
+        };
+
+        if (raceId) {
+            getRaceDetails();
+        }
+    }, [raceId])
 
   // Request location permissions and get the initial location
   useEffect(() => {
@@ -75,33 +100,45 @@ const StudentMap = () => {
     };
   }, [isStarted]);
 
+  console.log("race_id:", raceId)
+
   // Start the timer
-  const startTimer = () => {
-    setIsStarted(true);
-  };
-
-  // Terminate the session
-  const terminateSession = () => {
-    setIsStarted(false);
-    setIsTerminated(true);
-  };
-
-  // Validate the balise
-  const validateBalise = (number) => {
-    const baliseIndex = markers.findIndex((marker) => marker.number === parseInt(number));
-    if (baliseIndex !== -1 && !validatedBalises.includes(number)) {
-      setValidatedBalises([...validatedBalises, number]);
-      sendValidationToDatabase(userLocation, number);
-      setModalVisible(false);
-    } else {
-      Alert.alert("Invalid Balise", "The balise number entered is invalid or already validated.");
+  const startTimer = async () => {
+    try {
+      const raceRunner = await startRace(raceId);
+      setRaceRunnerId(raceRunner.race_id);
+      setIsStarted(true);
+    } catch (err) {
+      Alert.alert("Error", "Failed to start race. Please try again.")
     }
   };
 
-  // Function to send validation data to the database
-  const sendValidationToDatabase = (location, number) => {
-    console.log("Sending to database:", { location, number });
-    // TODO: Implement the API call to send data to the server
+  // Terminate the session
+  const terminateSession = async () => {
+    setIsStarted(false);
+    setIsTerminated(true);
+    try {
+      await terminateRace(raceRunnerId, time);
+      Alert.alert("Race Ended")
+    } catch (err) {
+      Alert.alert("Error", "Failed to end race, please try again.")
+    }
+  };
+
+  // Validate the balise
+  const validateBalise = async (number) => {
+    const baliseIndex = markers.findIndex((marker) => marker.number === parseInt(number));
+    if (baliseIndex !== -1 && !validatedBalises.includes(number)) {
+      try {
+        await recordCheckpoint(number, userLocation.longitude, userLocation.latitude, raceRunnerId); 
+        setValidatedBalises([...validatedBalises, number]);
+        setModalVisible(false);
+      } catch (error) {
+        Alert.alert("Error", "Failed to record checkpoint. Please try again.");
+      }
+    } else {
+      Alert.alert("Invalid Balise", "The balise number entered is invalid or already validated.");
+    }
   };
 
   return (
@@ -143,7 +180,7 @@ const StudentMap = () => {
                 </Marker>
                 <Circle
                   center={{ latitude: marker.latitude, longitude: marker.longitude }}
-                  radius={10} // radius in meters
+                  radius={5} // radius in meters
                   strokeColor={isValidated ? "rgba(0,255,0,0.5)" : "rgba(0,0,255,0.5)"}
                   fillColor={isValidated ? "rgba(0,255,0,0.1)" : "rgba(0,0,255,0.1)"}
                 />

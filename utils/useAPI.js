@@ -3,7 +3,8 @@ import { Alert } from "react-native";
 import { getId, getToken, clearStorage } from "./handleAsyncStorage";
 
 const apiSource = axios.create({
-    baseURL: 'https://django-apis-project-application-a52o4sa8a.vercel.app/api',
+    // baseURL: 'https://project-programmation-version2.vercel.app/api',
+    baseURL: 'http://10.0.2.2:8000/api',
 });
 
 const updateAxios = () => {
@@ -140,9 +141,51 @@ const fetchRaceDetails = async (raceId) => {
     }
 }
 
+const recordCheckpoint = async (number, longitude, latitude, id) => {
+    console.log(id)
+    let body = {
+        number: number,
+        longitude: longitude,
+        latitude: latitude,
+        race_runner_id: id
+    }
+    try {
+        const res = await apiSource.post('/record-checkpoint/', body)
+        console.log("Sucess", res.data)
+        return res.data;
+    } catch (err) {
+        console.log("Error recording checkpoint", err.response.data)
+        Alert.alert(err.response.data.message)
+    }
+}
+
+const startRace = async (raceId) => {
+    try {
+        const res = await apiSource.post(`/start-race/`, { race_id: raceId});
+        return res.data;
+    } catch(err) {
+        console.error("Error starting race:", err);
+    }
+}
+
+const terminateRace = async (id, total_time) => {
+    let body = {
+        race_runner_id: id,
+        total_time: total_time
+    }
+    try {
+        const res = await apiSource.post('/end-race-runner/', body);
+        return res.data;
+    } catch (err) {
+        console.error("Error terminating race:", err);
+    }
+}
+
+
+
 export {
     signUp, signIn, logOut,
     updateAxios, fetchGroups, joinGroup,
     fetchMyEvents, fetchEventDetail,
-    fetchRaceDetails
+    fetchRaceDetails, recordCheckpoint, terminateRace, startRace
 }
