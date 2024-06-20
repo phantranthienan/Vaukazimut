@@ -11,16 +11,18 @@ import {
   CreateEvents,
   CreateNewEvent,
   ShowEvents
+
 } from './functions/event';
 
 import { CreateNewGroup } from './functions/group';
 import GroupList from './functions/group-list';
+import { ScrollView } from 'react-native-web';
 
 function Events() {
   return (
     <View className="relative w-full h-full">
       <ShowEvents />
-      <View className="fixed bottom-0 z-10">
+      <View className="absolute w-full h-full z-10">
         <CreateNewEvent />
       </View>
     </View>

@@ -3,7 +3,7 @@ import { Alert } from 'react-native';
 import { getId, getToken, clearStorage } from './handleAsyncStorage';
 
 const apiSource = axios.create({
-  baseURL: 'https://project-programmation-version2.vercel.app'
+  baseURL: 'https://project-programmation-version2.vercel.app/api'
 });
 
 const updateAxios = () => {
