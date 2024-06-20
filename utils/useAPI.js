@@ -151,20 +151,22 @@ const recordCheckpoint = async (number, longitude, latitude, id) => {
     }
     try {
         const res = await apiSource.post('/record-checkpoint/', body)
-        console.log("Sucess", res.data)
+        console.log("Validate Success", res.data)
         return res.data;
     } catch (err) {
         console.log("Error recording checkpoint", err.response.data)
-        Alert.alert(err.response.data.message)
+        Alert.alert(err.response.data.message, "Terminate the race to get result.")
     }
 }
 
 const startRace = async (raceId) => {
+    console.log("race id:", raceId)
     try {
-        const res = await apiSource.post(`/start-race/`, { race_id: raceId});
+        const res = await apiSource.post(`/start-race/`, {race_id: raceId});
         return res.data;
     } catch(err) {
         console.error("Error starting race:", err);
+        Alert.alert(err.response.data.message);
     }
 }
 
@@ -174,11 +176,21 @@ const terminateRace = async (id, total_time) => {
         total_time: total_time
     }
     try {
-        const res = await apiSource.post('/end-race-runner/', body);
+        const res = await apiSource.patch('/end-race-runner/', body);
         return res.data;
     } catch (err) {
         console.error("Error terminating race:", err);
     }
+}
+
+const fetchMyEventResult = async (eventId) => {
+    try {
+        const response = await apiSource.get(`/my-score/${eventId}/`);
+        return response.data;
+      } catch (error) {
+        console.log("Failed to fetch score", error);
+        Alert.alert("Failed to fetch score. Please try again.");
+      }
 }
 
 
@@ -186,6 +198,6 @@ const terminateRace = async (id, total_time) => {
 export {
     signUp, signIn, logOut,
     updateAxios, fetchGroups, joinGroup,
-    fetchMyEvents, fetchEventDetail,
+    fetchMyEvents, fetchEventDetail, fetchMyEventResult,
     fetchRaceDetails, recordCheckpoint, terminateRace, startRace
 }

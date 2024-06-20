@@ -8,7 +8,7 @@ import {
   TextInput,
   TouchableOpacity,
   ActivityIndicator,
-  BackHandler
+  BackHandler,
 } from "react-native";
 import MapView, { PROVIDER_GOOGLE, Marker, Circle } from "react-native-maps";
 import React, { useState, useEffect, useRef } from "react";
@@ -26,8 +26,9 @@ import {
 import { getId } from "../../../../utils/handleAsyncStorage";
 
 const StudentMap = () => {
-
   const { raceId } = useLocalSearchParams();
+  const router = useRouter(); // Use router for navigation
+
   //******************************************************/
   //******************** USE STATE ***********************/
   //******************************************************/
@@ -35,7 +36,7 @@ const StudentMap = () => {
   const [userLocation, setUserLocation] = useState(null);
   const [markers, setMarkers] = useState([]);
 
-  const [timeLimit, setTimeLimit] = useState(0);
+  const [timeLimit, setTimeLimit] = useState("00:00:00");
   const [isStarted, setIsStarted] = useState(false);
   const [isTerminated, setIsTerminated] = useState(false);
   const [time, setTime] = useState(0);
@@ -134,6 +135,20 @@ const StudentMap = () => {
     return location.coords;
   };
 
+  // Convert time to "HH:MM:SS" format
+  const formatTime = (timeInSeconds) => {
+    const hours = Math.floor(timeInSeconds / 3600);
+    const minutes = Math.floor((timeInSeconds % 3600) / 60);
+    const seconds = timeInSeconds % 60;
+    return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+  };
+
+  // Convert time limit to seconds
+  const timeLimitInSeconds = () => {
+    const [hours, minutes, seconds] = timeLimit.split(":").map(Number);
+    return hours * 3600 + minutes * 60 + seconds;
+  };
+
   // Start the timer
   const startTimer = async () => {
     try {
@@ -142,7 +157,7 @@ const StudentMap = () => {
       setRaceRunnerId(raceRunner.data.id);
       setIsStarted(true);
     } catch (err) {
-      Alert.alert("Error", "Failed to start race. Please try again.");
+      console.log("Error", err);
     }
   };
 
@@ -151,8 +166,11 @@ const StudentMap = () => {
     setIsStarted(false);
     setIsTerminated(true);
     try {
-      await terminateRace(raceRunnerId, time);
-      Alert.alert("Race Ended", "You can now navigate back.");
+      const formattedTime = formatTime(time);
+      const result = await terminateRace(raceRunnerId, formattedTime);
+      console.log(result);
+      Alert.alert("Race Ended", `You achieved ${result.score} points in ${result.total_time}.`);
+      router.back(); // Navigate back to previous page
     } catch (err) {
       Alert.alert("Error", "Failed to end race, please try again.");
     }
@@ -163,7 +181,7 @@ const StudentMap = () => {
     const baliseIndex = markers.findIndex(
       (marker) => marker.number === parseInt(number)
     );
-    if (baliseIndex !== -1 && !validatedBalises.includes(number)) {
+    if (baliseIndex !== -1) {
       try {
         await recordCheckpoint(
           number,
@@ -171,7 +189,13 @@ const StudentMap = () => {
           userLocation.latitude,
           raceRunnerId
         );
-        setValidatedBalises([...validatedBalises, number]);
+        setValidatedBalises((prevValidatedBalises) => {
+          // Ensure no duplicates in the validated balises list
+          if (!prevValidatedBalises.includes(number)) {
+            return [...prevValidatedBalises, number];
+          }
+          return prevValidatedBalises;
+        });
         setModalVisible(false);
       } catch (error) {
         Alert.alert("Error", "Failed to record checkpoint. Please try again.");
@@ -179,10 +203,13 @@ const StudentMap = () => {
     } else {
       Alert.alert(
         "Invalid Balise",
-        "The balise number entered is invalid or already validated."
+        "The balise number entered is invalid."
       );
     }
   };
+
+  const currentTime = formatTime(time);
+  const limitExceeded = time > timeLimitInSeconds();
 
   return (
     <>
@@ -205,14 +232,14 @@ const StudentMap = () => {
               setRegion(newRegion);
             }}
           >
-            {markers.map((marker, index) => {
-              location = {
+            {markers.map((marker) => {
+              const location = {
                 latitude: marker.latitude,
                 longitude: marker.longitude,
-              }
+              };
               const isValidated = validatedBalises.includes(marker.number);
               return (
-                <React.Fragment key={marker.id}>
+                <React.Fragment key={`${marker.id}-${isValidated}`}>
                   <Marker
                     coordinate={location}
                     title={`Balise ${marker.number}`}
@@ -229,7 +256,7 @@ const StudentMap = () => {
                         {marker.number}
                       </Text>
                       <Image
-                        source={icons.pin}
+                        source={isValidated ? icons.pingreen : icons.pin}
                         style={
                           isValidated
                             ? styles.validatedMarkerImage
@@ -260,10 +287,10 @@ const StudentMap = () => {
         <View style={styles.buttons}>
           {!isStarted && !isTerminated && (
             <TouchableOpacity
-              className="bg-black rounded-xl w-[40vw] p-4 justify-center"
-              onPress={() => startTimer()}
+              className="bg-primary-emerald rounded-xl w-[40vw] p-4 justify-center"
+              onPress={startTimer}
             >
-              <Text className="w-full text-center text-white font-pbold text-3xl">
+              <Text className="w-full text-center text-primary-jungle font-pbold text-3xl">
                 Start
               </Text>
             </TouchableOpacity>
@@ -271,18 +298,18 @@ const StudentMap = () => {
           {isStarted && !isTerminated && (
             <>
               <TouchableOpacity
-                className="bg-white rounded-xl w-[30vw] h-12 justify-center border-2"
+                className="bg-primary-jungle rounded-xl w-[30vw] h-12 justify-center border-2"
                 onPress={() => setModalVisible(true)}
               >
-                <Text className="w-full text-center font-pregular">
-                  Validate Balise
+                <Text className="text-white w-full text-center font-psemibold">
+                  Validate
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                className="bg-white rounded-xl w-[30vw] h-12 justify-center border-2"
+                className="bg-primary-jungle rounded-xl w-[30vw] h-12 justify-center border-2"
                 onPress={terminateSession}
               >
-                <Text className="w-full text-center font-pregular">
+                <Text className="text-white w-full text-center font-psemibold">
                   Terminate
                 </Text>
               </TouchableOpacity>
@@ -292,8 +319,8 @@ const StudentMap = () => {
 
         {isStarted && (
           <View style={styles.timer}>
-            <Text className="text-xl font-psemibold">
-              Time: {new Date(time * 1000).toISOString().substr(11, 8)}
+            <Text className="text-xl font-psemibold" style={{ color: limitExceeded ? 'red' : 'black' }}>
+              Time: {currentTime}
             </Text>
           </View>
         )}
@@ -316,7 +343,7 @@ const StudentMap = () => {
             <View style={styles.modalView}>
               <Text style={styles.modalText}>Enter Balise Number:</Text>
               <TextInput
-                style={styles.input}
+                className="w-full border-2 mb-4 p-2 rounded-md px-4"
                 keyboardType="numeric"
                 value={baliseInput}
                 onChangeText={setBaliseInput}
@@ -438,14 +465,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 18,
     fontWeight: "bold",
-  },
-  input: {
-    width: "100%",
-    height: 40,
-    borderColor: "gray",
-    borderWidth: 1,
-    marginBottom: 15,
-    paddingLeft: 10,
   },
 });
 

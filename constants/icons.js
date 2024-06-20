@@ -19,8 +19,10 @@ import check from "../assets/icons/check.png";
 import start from "../assets/icons/start.png";
 import clean from "../assets/icons/clean.png";
 import pin from "../assets/icons/pin.png";
+import pingreen from "../assets/icons/pingreen.png";
 
 export default {
+  pingreen,
   play,
   bookmark,
   home,
