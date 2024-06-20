@@ -1,39 +1,45 @@
-import IconButton from '../../../components/IconButton';
-import { icons } from '../../../constants';
-import CustomButton from '../../../components/CustomButton';
-import { Event, events, groups, maps } from '../data';
-import MapProf from '../map-prof';
+import IconButton from "../../../components/IconButton";
+import { icons } from "../../../constants";
+import CustomButton from "../../../components/CustomButton";
+import { Event, events, groups, maps } from "../data";
+import MapProf from "../map-prof";
 
-import { router } from 'expo-router';
+import { router } from "expo-router";
 import {
   Text,
   TextInput,
   View,
   Modal,
   TouchableOpacity,
-  FlatList
-} from 'react-native';
-import RNPickerSelect from 'react-native-picker-select';
-import { useState } from 'react';
-import DatePicker from 'react-native-modern-datepicker';
-import { getToday, getFormatedDate } from 'react-native-modern-datepicker';
-import { useNavigation } from '@react-navigation/native';
+  FlatList,
+} from "react-native";
+import RNPickerSelect from "react-native-picker-select";
+import { useState } from "react";
+import DatePicker from "react-native-modern-datepicker";
+import { getToday, getFormatedDate } from "react-native-modern-datepicker";
+import { useNavigation } from "@react-navigation/native";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 const CreateNewEvent = () => {
   const [modalVisible, setModalVisible] = useState(false);
-  const [name, setName] = useState('');
-  const [selectedDate, setSelectedDate] = useState(getToday());
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [selectedTime, setSelectedTime] = useState();
-  const [showTimePicker, setShowTimePicker] = useState();
+  const [name, setName] = useState("");
+  const [dateStart, setDateStart] = useState(getToday());
+  const [showDateStartPicker, setShowDateStartPicker] = useState(false);
+  const [timeStart, setTimeStart] = useState();
+  const [showTimeStartPicker, setShowTimeStartPicker] = useState(false);
+
+  const [dateEnd, setDateEnd] = useState(getToday());
+  const [showDateEndPicker, setShowDateEndPicker] = useState(false);
+  const [timeEnd, setTimeEnd] = useState();
+  const [showTimeEndPicker, setShowTimeEndPicker] = useState(false);
 
   const today = getToday();
-  const startDate = getFormatedDate(today, 'DD/MM/YYYY');
+  const startDate = getFormatedDate(today, "YYYY/MM/DD");
 
   const handleCreateRun = () => {
     // Handle the creation of a new run here
     setModalVisible(false);
-    setShowDatePicker(false);
+    setShowDateStartPicker(false);
   };
 
   return (
@@ -58,15 +64,54 @@ const CreateNewEvent = () => {
               />
               <Text className="mb-2 text-lg">Date and Time</Text>
               <Text className="mb-2 text-base">Start</Text>
-              <View className="flex-row items-center w-full pl-2 rounded border border-inherit">
-                <Text className="flex-1">{selectedDate}</Text>
-                <IconButton
-                  icon={icons.plus}
-                  handlePress={() => {
-                    setShowDatePicker(true);
-                    setModalVisible(false);
-                  }}
-                />
+              <View className="flex flex-row items-center w-full pl-2 rounded">
+                <View className="grid grid-cols-4">
+                  <Text className="cols-span-3">{dateStart}</Text>
+                  <IconButton
+                    containerStyles={"cols-span-1"}
+                    icon={icons.plus}
+                    handlePress={() => {
+                      setShowDateStartPicker(!showDateStartPicker);
+                      setModalVisible(!modalVisible);
+                    }}
+                  />
+                </View>
+                <View className="grid grid-cols-4">
+                  <Text className="cols-span-3">{timeStart}</Text>
+                  <IconButton
+                    containerStyles={"cols-span-1"}
+                    icon={icons.plus}
+                    handlePress={() => {
+                      setShowTimeStartPicker(!showTimeStartPicker);
+                      setModalVisible(!modalVisible);
+                    }}
+                  />
+                </View>
+              </View>
+              <Text className="mb-2 text-base">End</Text>
+              <View className="flex flex-row items-center w-full pl-2 rounded">
+                <View className="grid grid-cols-4">
+                  <Text className="cols-span-3">{dateEnd}</Text>
+                  <IconButton
+                    containerStyles={"cols-span-1"}
+                    icon={icons.plus}
+                    handlePress={() => {
+                      setShowDateEndPicker(!showDateEndPicker);
+                      setModalVisible(!modalVisible);
+                    }}
+                  />
+                </View>
+                <View className="grid grid-cols-4">
+                  <Text className="cols-span-3">{timeEnd}</Text>
+                  <IconButton
+                    containerStyles={"cols-span-1"}
+                    icon={icons.plus}
+                    handlePress={() => {
+                      setShowTimeEndPicker(!showTimeEndPicker);
+                      setModalVisible(!modalVisible);
+                    }}
+                  />
+                </View>
               </View>
             </View>
             <TouchableOpacity
@@ -82,27 +127,123 @@ const CreateNewEvent = () => {
       <Modal
         animationType="slide"
         transparent={true}
-        visible={showDatePicker}
-        onRequestClose={() => setShowDatePicker(false)}
+        visible={showDateStartPicker}
+        onRequestClose={() => setShowDateStartPicker(false)}
       >
         <View className="justify-center items-center my-2 h-full bg-white rounded-xl p-9 items-center shadow-lg w-max">
           <Text className="text-xl text-black font-semibold text-center mb-4">
-            Choose Date
+            Choose start date
           </Text>
           <DatePicker
             mode="calendar"
             minimumDate={startDate}
-            selected={selectedDate}
-            onDateChange={(selectedDate) => {
-              setSelectedDate(selectedDate);
-              setShowDatePicker(false);
+            selected={dateStart}
+            onDateChange={(dateStart) => {
+              setDateStart(dateStart);
+              setShowDateStartPicker(false);
               setModalVisible(true);
             }}
           />
           <CustomButton
             title="Close"
             handlePress={() => {
-              setShowDatePicker(!showDatePicker);
+              setShowDateStartPicker(!showDateStartPicker);
+              setModalVisible(!modalVisible);
+            }}
+            containerStyles="h-min m-0 bg-cyan-400"
+            textStyles="text-base font-thin"
+          ></CustomButton>
+        </View>
+      </Modal>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={showDateStartPicker}
+        onRequestClose={() => setShowDateStartPicker(false)}
+      >
+        <View className="justify-center items-center my-2 h-full bg-white rounded-xl p-9 items-center shadow-lg w-max">
+          <Text className="text-xl text-black font-semibold text-center mb-4">
+            Choose start time
+          </Text>
+          <DateTimePicker
+            mode="time"
+            value={timeStart}
+            is24Hour={true}
+            onDateChange={(dateStart) => {
+              setDateStart(dateStart);
+              setShowDateStartPicker(false);
+              setModalVisible(true);
+            }}
+          />
+          <CustomButton
+            title="Close"
+            handlePress={() => {
+              setShowDateStartPicker(!showDateStartPicker);
+              setModalVisible(!modalVisible);
+            }}
+            containerStyles="h-min m-0 bg-cyan-400"
+            textStyles="text-base font-thin"
+          ></CustomButton>
+        </View>
+      </Modal>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={showDateEndPicker}
+        onRequestClose={() => setShowDateEndPicker(false)}
+      >
+        <View className="justify-center items-center my-2 h-full bg-white rounded-xl p-9 items-center shadow-lg w-max">
+          <Text className="text-xl text-black font-semibold text-center mb-4">
+            Choose end date
+          </Text>
+          <DatePicker
+            mode="calendar"
+            minimumDate={EndDate}
+            selected={dateEnd}
+            onDateChange={(dateEnd) => {
+              setDateEnd(dateEnd);
+              setShowDateEndPicker(false);
+              setModalVisible(true);
+            }}
+          />
+          <CustomButton
+            title="Close"
+            handlePress={() => {
+              setShowDateEndPicker(!showDateEndPicker);
+              setModalVisible(!modalVisible);
+            }}
+            containerStyles="h-min m-0 bg-cyan-400"
+            textStyles="text-base font-thin"
+          ></CustomButton>
+        </View>
+      </Modal>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={showDateEndPicker}
+        onRequestClose={() => setShowDateEndPicker(false)}
+      >
+        <View className="justify-center items-center my-2 h-full bg-white rounded-xl p-9 items-center shadow-lg w-max">
+          <Text className="text-xl text-black font-semibold text-center mb-4">
+            Choose end time
+          </Text>
+          <DateTimePicker
+            mode="time"
+            value={timeEnd}
+            is24Hour={true}
+            onDateChange={(dateEnd) => {
+              setDateEnd(dateEnd);
+              setShowDateEndPicker(false);
+              setModalVisible(true);
+            }}
+          />
+          <CustomButton
+            title="Close"
+            handlePress={() => {
+              setShowDateEndPicker(!showDateEndPicker);
               setModalVisible(!modalVisible);
             }}
             containerStyles="h-min m-0 bg-cyan-400"
@@ -132,14 +273,14 @@ const CreateSession = ({ sessionName, sessionDate, map }) => {
 
 const CreateNewRunBtn = () => {
   const [modalVisible, setModalVisible] = useState(false);
-  const [name, setName] = useState('');
+  const [name, setName] = useState("");
   const [groupRunner, setGroupRunner] = useState(groups[0]);
   const [showMap, setShowMap] = useState(false);
 
   const navigation = useNavigation();
 
   function handleReload() {
-    navigation.replace('tab-bar');
+    navigation.replace("tab-bar");
   }
 
   const handleCreateRun = () => {
@@ -151,7 +292,7 @@ const CreateNewRunBtn = () => {
       publish: false,
       is_finish: false,
       description: null,
-      location: maps[name]
+      location: maps[name],
     });
     console.log(events);
     handleReload();
@@ -185,12 +326,12 @@ const CreateNewRunBtn = () => {
                   value={groupRunner}
                   onValueChange={(value) => setGroupRunner(value)}
                   placeholder={{
-                    label: 'Exited groups',
-                    value: null
+                    label: "Exited groups",
+                    value: null,
                   }}
                   items={groups.map((group) => ({
                     label: group,
-                    value: group
+                    value: group,
                   }))}
                 />
               </View>
@@ -292,7 +433,7 @@ const ShowEvents = () => {
               containerStyles="aspect-square m-1"
               icon={icons.bookmark}
               handlePress={() => {
-                fixMap(item, events[item]['location']);
+                fixMap(item, events[item]["location"]);
               }}
             ></IconButton>
             <IconButton
