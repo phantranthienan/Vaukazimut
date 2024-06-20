@@ -9,9 +9,7 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router"; // Ensure useRouter is imported correctly
 
-import { clearStorage } from "../../utils/handleAsyncStorage";
-import CustomButton from "../../components/CustomButton";
-import { fetchMyEvents, logOut, updateAxios } from "../../utils/useAPI"; // Ensure this path is correct
+import { fetchMyEvents } from "../../utils/useAPI"; // Ensure this path is correct
 
 const EventList = () => {
   const [events, setEvents] = useState([]);

@@ -25,7 +25,7 @@ const SignIn = () => {
         if (token && role) {
           updateAxios();
           if (role === "Coach") {
-            router.replace("/homeProf");
+            router.replace("/(prof)/(events)/event-list");
           } else if (role === "Runner") {
             router.replace("/group-list");
           }
@@ -60,9 +60,10 @@ const SignIn = () => {
           updateAxios();
 
           if (role === "Coach") {
-            router.replace("/homeProf");
+            console.log("Coach");
+            router.replace("/(prof)/(events)/event-list");
           } else {
-            router.replace("/group-list");
+            router.replace("/(student)/group-list");
           }
         } 
       } catch (error) {

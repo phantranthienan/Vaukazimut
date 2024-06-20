@@ -193,11 +193,21 @@ const fetchMyEventResult = async (eventId) => {
       }
 }
 
-
+//******************* Fetch Data for Coach ********************/ 
+const fetchCoachEvents = async () => {
+    try {
+        const res = await apiSource.get('/my-event-coach/')
+        return res.data;
+    } catch (err) {
+        console.log("Error fetching my events:", err);
+        Alert.alert(err.response.data.message);
+    }
+}
 
 export {
     signUp, signIn, logOut,
     updateAxios, fetchGroups, joinGroup,
     fetchMyEvents, fetchEventDetail, fetchMyEventResult,
-    fetchRaceDetails, recordCheckpoint, terminateRace, startRace
+    fetchRaceDetails, recordCheckpoint, terminateRace, startRace,
+    fetchCoachEvents
 }
