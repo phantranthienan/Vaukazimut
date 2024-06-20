@@ -140,36 +140,6 @@ const fetchRaceDetails = async (raceId) => {
     }
 }
 
-const sendValidatedBalise = async (userLocation, number, userId) => {
-    const body = {
-        number: number,
-        longitude: userLocation.longitude,
-        latitude: userLocation.latitude,
-        race_runner_id: userId,
-    }
-    try {
-        const res = await apiSource.post('/record-checkpoint/', body);
-        return res.data;
-    } catch (err) {
-        console.error("Error sending validated balise:", err);
-    }
-}
-
-const fetchResult = async (userId, totalTime) => {
-    const body = {
-        race_runner_id: userId,
-        total_time: totalTime,
-    }
-    try {
-        const res = await apiSource.patch('/record-result/', body);
-        return res.data;
-    } catch (err) {
-        console.error("Error fetching result:", err);
-    }
-}
-
-
-
 export {
     signUp, signIn, logOut,
     updateAxios, fetchGroups, joinGroup,
