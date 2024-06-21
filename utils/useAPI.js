@@ -287,6 +287,28 @@ const createLocation = async (name, longitude, latitude) => {
         Alert.alert(err.response.data.message);
     }
 }
+const saveListCheckpoints = async (raceId, checkpoints) => {
+    try {
+        const res = await apiSource.post(`/save-list-checkpoints/`, {
+            race_id: raceId,
+            checkpoints,
+        })
+        return res.data;
+    } catch (err) {
+        console.error("Error saving list checkpoints:", err);
+        Alert.alert("Error saving list checkpoints:", err.response.data.message);
+    }
+}
+
+const fetchCoachRaceDetails = async (raceId) => {
+    try {
+        const res = await apiSource.get(`/race-coach/${raceId}/`)
+        return res.data;
+    }
+    catch (err) {
+        console.error("Error fetching race details:", err);
+    }
+}
 
 export {
     signUp, signIn, logOut,
@@ -294,5 +316,5 @@ export {
     fetchMyEvents, fetchEventDetail, fetchMyEventResult,
     fetchRaceDetails, recordCheckpoint, terminateRace, startRace,
     fetchCoachEvents, fetchCoachGroups, fetchLocations, fetchCoachEventDetail, fetchCoachResults,
-    createGroup, createLocation, createEvent
+    createGroup, createLocation, createEvent, saveListCheckpoints, fetchCoachRaceDetails
 }

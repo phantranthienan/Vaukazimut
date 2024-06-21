@@ -1,14 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Alert, ScrollView, TouchableOpacity, RefreshControl } from "react-native";
+import {
+  View,
+  Text,
+  Alert,
+  ScrollView,
+  TouchableOpacity,
+  RefreshControl,
+} from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { fetchCoachEventDetail, fetchCoachResults } from "../../../../utils/useAPI" // Ensure this path is correct
+import { fetchCoachEventDetail } from "../../../../utils/useAPI"; // Ensure this path is correct
 
 const EventDetail = () => {
   const { eventId } = useLocalSearchParams(); // Access the eventId from the query params
   const [event, setEvent] = useState(null);
-  const [result, setResult] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
-  const [loadingResult, setLoadingResult] = useState(false);
   const router = useRouter();
 
   const onRefresh = async () => {
@@ -27,19 +32,6 @@ const EventDetail = () => {
     }
   };
 
-  const getEventResult = async () => {
-    try {
-      setLoadingResult(true);
-      const resultData = await fetchCoachResults(eventId);
-      setResult(resultData);
-    } catch (error) {
-      console.error(error);
-      Alert.alert("Error", "Failed to fetch event result. Please try again.");
-    } finally {
-      setLoadingResult(false);
-    }
-  };
-
   useEffect(() => {
     if (eventId) {
       getEventDetail();
@@ -51,7 +43,7 @@ const EventDetail = () => {
   }
 
   const handleRaceSelect = (race) => {
-    router.push(`/event-detail/map-race/${race.id}`);
+    router.push(`/event-detail/create-race/${race.id}`);
   };
 
   return (
@@ -93,30 +85,33 @@ const EventDetail = () => {
           </TouchableOpacity>
         ))}
       </View>
-      {/* <TouchableOpacity
-        activeOpacity={0.8}
-        onPress={getEventResult}
-        className="m-auto h-16 w-[90vw] bg-primary-jungle my-2 flex-row items-center justify-center px-4 rounded-2xl"
-      >
-        <Text className="text-white text-2xl font-pbold">
-          {loadingResult ? "Loading..." : "Show Result"}
-        </Text>
-      </TouchableOpacity>
-      {result && (
-        <View className="w-[90vw] mx-auto my-2 rounded-xl items-center bg-white p-4">
-          <Text className="text-primary-jungle font-pbold text-3xl w-full text-center">
-            My Result
-          </Text>
-          <Text className="text-black font-pregular text-lg">
-            Total Time: {result.total_time}
-          </Text>
-          <Text className="text-black font-pregular text-lg">
-            Total Score: {result.total_score}
-          </Text>
-        </View>
-      )} */}
     </ScrollView>
   );
 };
 
 export default EventDetail;
+
+{
+  /* <TouchableOpacity
+  activeOpacity={0.8}
+  onPress={getEventResult}
+  className="m-auto h-16 w-[90vw] bg-primary-jungle my-2 flex-row items-center justify-center px-4 rounded-2xl"
+>
+  <Text className="text-white text-2xl font-pbold">
+    {loadingResult ? "Loading..." : "Show Result"}
+  </Text>
+</TouchableOpacity>
+{result && (
+  <View className="w-[90vw] mx-auto my-2 rounded-xl items-center bg-white p-4">
+    <Text className="text-primary-jungle font-pbold text-3xl w-full text-center">
+      My Result
+    </Text>
+    <Text className="text-black font-pregular text-lg">
+      Total Time: {result.total_time}
+    </Text>
+    <Text className="text-black font-pregular text-lg">
+      Total Score: {result.total_score}
+    </Text>
+  </View>
+)} */
+}
