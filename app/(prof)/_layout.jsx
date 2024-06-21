@@ -95,7 +95,7 @@ const ProfLayout = () => {
         }}
       />
       <Tabs.Screen
-        name="location-list"
+        name="(locations)"
         options={{
           title: "Locations",
           headerRight: () => <LogoutText />,

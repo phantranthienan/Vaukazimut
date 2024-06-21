@@ -27,7 +27,7 @@ const SignIn = () => {
           if (role === "Coach") {
             router.replace("/(prof)/(events)/event-list");
           } else if (role === "Runner") {
-            router.replace("/group-list");
+            router.replace("/(student)/group-list");
           }
         } 
       } catch (error) {

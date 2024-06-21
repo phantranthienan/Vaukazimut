@@ -194,12 +194,96 @@ const fetchMyEventResult = async (eventId) => {
 }
 
 //******************* Fetch Data for Coach ********************/ 
+const fetchCoachGroups = async () => {
+    try {
+        const res = await apiSource.get('/group-runners-coach/')
+        return res.data;
+    } catch (err) {
+        console.log("Error fetching groups:", err);
+        Alert.alert(err.response.data.message);
+    }
+}
+
+const createGroup = async (name, department) => {  
+    try {
+        const res = await apiSource.post('/group-runners-coach/', {name: name, department: department})
+        return res.data;
+    } catch (err) {
+        console.log("Error creating group:", err);
+        Alert.alert(err.response.data.message);
+    }
+}
+
 const fetchCoachEvents = async () => {
     try {
-        const res = await apiSource.get('/my-event-coach/')
+        const res = await apiSource.get('/events-coach/')
         return res.data;
     } catch (err) {
         console.log("Error fetching my events:", err);
+        Alert.alert(err.response.data.message);
+    }
+}
+
+const createEvent = async (name, startTime, endTime, locationId, coachId, groupRunnerId, publish) => {
+    let body = {
+        name: name,
+        start: startTime,
+        end: endTime,
+        location_id: locationId,
+        coach_id: coachId,
+        group_runner_id: groupRunnerId,
+        publish: publish
+    }
+    try {
+        const res = await apiSource.post('/events-coach/', body)
+        return res.data;
+    } catch (err) {
+        console.log("Error creating event:", err);
+        Alert.alert(err.response.data.message);
+    }
+}
+
+const fetchCoachEventDetail = async (eventId) => {
+    try {
+        const res = await apiSource.get(`/events-coach/${eventId}/`)
+        return res.data;
+    } catch (err) {
+        console.error("Error fetching event detail:", err);
+    }
+}
+
+const fetchCoachResults = async (eventId) => {
+    try {
+        const res = await apiSource.get(`/score-total/${eventId}/`)
+        return res.data;
+    } catch (err) {
+        console.error("Error fetching results:", err);
+        Alert.alert(err.response.data.message);
+    }
+
+}
+
+const fetchLocations = async () => {
+    try {
+        const res = await apiSource.get('/locations/')
+        return res.data;
+    } catch (err) {
+        console.log("Error fetching locations:", err);
+        Alert.alert(err.response.data.message);
+    }
+}
+
+const createLocation = async (name, longitude, latitude) => {
+    let body = {
+        name: name,
+        longitude: longitude,
+        latitude: latitude
+    }
+    try {
+        const res = await apiSource.post('/locations/', body)
+        return res.data;
+    } catch (err) {
+        console.log("Error creating location:", err);
         Alert.alert(err.response.data.message);
     }
 }
@@ -209,5 +293,6 @@ export {
     updateAxios, fetchGroups, joinGroup,
     fetchMyEvents, fetchEventDetail, fetchMyEventResult,
     fetchRaceDetails, recordCheckpoint, terminateRace, startRace,
-    fetchCoachEvents
+    fetchCoachEvents, fetchCoachGroups, fetchLocations, fetchCoachEventDetail, fetchCoachResults,
+    createGroup, createLocation, createEvent
 }
