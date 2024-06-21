@@ -35,6 +35,7 @@ const StudentMap = () => {
   const [region, setRegion] = useState(INSA_CVL);
   const [userLocation, setUserLocation] = useState(null);
   const [markers, setMarkers] = useState([]);
+  const [startPoint, setStartPoint] = useState(null);
 
   const [timeLimit, setTimeLimit] = useState("00:00:00");
   const [isStarted, setIsStarted] = useState(false);
@@ -116,7 +117,9 @@ const StudentMap = () => {
     try {
       setIsLoading(true); // Start loading
       const raceData = await fetchRaceDetails(raceId);
+      console.log(raceData);
       setMarkers(raceData.checkpoints);
+      setStartPoint(raceData.event_location); // Set start point
       setTimeLimit(raceData.time_limit);
     } catch (err) {
       console.error(err);
@@ -178,6 +181,8 @@ const StudentMap = () => {
 
   // Validate the balise
   const validateBalise = async (number) => {
+    let location = await getCurrentLocation();
+    setUserLocation(location);
     const baliseIndex = markers.findIndex(
       (marker) => marker.number === parseInt(number)
     );
@@ -232,6 +237,13 @@ const StudentMap = () => {
               setRegion(newRegion);
             }}
           >
+            {startPoint && (
+              <Marker coordinate={startPoint}>
+                <View style={styles.marker}>
+                  <Image source={icons.start} style={styles.startMarkerImage} />
+                </View>
+              </Marker>
+            )}
             {markers.map((marker) => {
               const location = {
                 latitude: marker.latitude,
@@ -407,6 +419,11 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     tintColor: "green",
+  },
+  startMarkerImage: {
+    width: 32,
+    height: 32,
+    tintColor: "blue",
   },
   buttons: {
     position: "absolute",

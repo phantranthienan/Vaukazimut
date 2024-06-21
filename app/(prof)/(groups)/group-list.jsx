@@ -4,6 +4,7 @@ import {
   Modal,
   TextInput,
   ScrollView,
+  RefreshControl,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
@@ -11,13 +12,20 @@ import { useRouter } from "expo-router";
 import CustomButton from "../../../components/CustomButton";
 import { fetchCoachGroups, createGroup } from "../../../utils/useAPI"; // Ensure this path is correct
 
-
 const GroupList = () => {
   const [groups, setGroups] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [newGroupName, setNewGroupName] = useState("");
   const [newGroupDepartment, setNewGroupDepartment] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
+
   const router = useRouter();
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await getEvents();
+    setRefreshing(false);
+  };
 
   const getGroups = async () => {
     try {
@@ -49,7 +57,12 @@ const GroupList = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={{ paddingVertical: 0}}>
+    <ScrollView
+      contentContainerStyle={{ paddingVertical: 0 }}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       <View className="h-full items-center bg-primary-emerald">
         {groups.length === 0 ? (
           <View>

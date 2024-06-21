@@ -288,11 +288,23 @@ const createLocation = async (name, longitude, latitude) => {
     }
 }
 const saveListCheckpoints = async (raceId, checkpoints) => {
+    const transformedCheckpoints = checkpoints.map(checkpoint => ({
+        number: checkpoint.number,
+        longitude: checkpoint.longitude,
+        latitude: checkpoint.latitude,
+        score: checkpoint.score
+    }));
+    // const jsonCheckpoints = JSON.stringify(transformedCheckpoints);
     try {
-        const res = await apiSource.post(`/save-list-checkpoints/`, {
+        // console.log("Checkpoints:", JSON.stringify({
+        //     race_id: raceId,
+        //     checkpoints: transformedCheckpoints
+        // }));
+        const res = await apiSource.post(`/save-list-checkpoint/`, {
             race_id: raceId,
-            checkpoints,
+            checkpoints: transformedCheckpoints,
         })
+        Alert.alert(res.data.message);
         return res.data;
     } catch (err) {
         console.error("Error saving list checkpoints:", err);
@@ -310,11 +322,27 @@ const fetchCoachRaceDetails = async (raceId) => {
     }
 }
 
+const createRace = async (eventId, raceName, timeLimit, raceType = "Normal") => {
+    let body ={
+        event_id: eventId,
+        name: raceName,
+        time_limit: timeLimit,
+        race_type_name: raceType
+    }
+    try {
+        const res = await apiSource.post(`/create-race/`, body)
+        return res.data;
+    } catch (err) {
+        console.error("Error creating race:", err);
+        Alert.alert(err.response.data.message);
+    }
+}
+
 export {
     signUp, signIn, logOut,
     updateAxios, fetchGroups, joinGroup,
     fetchMyEvents, fetchEventDetail, fetchMyEventResult,
     fetchRaceDetails, recordCheckpoint, terminateRace, startRace,
     fetchCoachEvents, fetchCoachGroups, fetchLocations, fetchCoachEventDetail, fetchCoachResults,
-    createGroup, createLocation, createEvent, saveListCheckpoints, fetchCoachRaceDetails
+    createGroup, createLocation, createEvent, saveListCheckpoints, fetchCoachRaceDetails, createRace
 }

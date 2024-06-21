@@ -6,14 +6,20 @@ import {
   ScrollView,
   TouchableOpacity,
   RefreshControl,
+  Modal,
+  TextInput,
+  Button,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { fetchCoachEventDetail } from "../../../../utils/useAPI"; // Ensure this path is correct
+import { fetchCoachEventDetail, createRace } from "../../../../utils/useAPI"; // Ensure this path is correct
 
 const EventDetail = () => {
   const { eventId } = useLocalSearchParams(); // Access the eventId from the query params
   const [event, setEvent] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [raceName, setRaceName] = useState('');
+  const [timeLimit, setTimeLimit] = useState('');
   const router = useRouter();
 
   const onRefresh = async () => {
@@ -38,13 +44,25 @@ const EventDetail = () => {
     }
   }, [eventId]);
 
-  if (!event) {
-    return <Text>Loading...</Text>;
-  }
-
   const handleRaceSelect = (race) => {
     router.push(`/event-detail/create-race/${race.id}`);
   };
+
+  const handleCreateRace = async () => {
+    try {
+      await createRace(eventId, raceName, timeLimit);
+      setModalVisible(false);
+      setRaceName('');
+      setTimeLimit('');
+      await getEventDetail(); // Refresh the event details to show the new race
+    } catch (error) {
+      console.error("Error creating race:", error);
+    }
+  };
+
+  if (!event) {
+    return <Text>Loading...</Text>;
+  }
 
   return (
     <ScrollView
@@ -84,7 +102,41 @@ const EventDetail = () => {
             </Text>
           </TouchableOpacity>
         ))}
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={() => setModalVisible(true)}
+          className="m-auto h-16 w-full bg-primary-jungle my-2 flex-row items-center justify-center px-4 rounded-2xl"
+        >
+          <Text className="text-white text-2xl font-pbold">Create Race</Text>
+        </TouchableOpacity>
       </View>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
+          <View className="w-4/5 bg-white rounded-lg p-5 shadow-lg">
+            <Text className="text-xl font-semibold mb-4">Create New Race</Text>
+            <TextInput
+              placeholder="Race Name"
+              value={raceName}
+              onChangeText={setRaceName}
+              className="border p-2 rounded mb-4"
+            />
+            <TextInput
+              placeholder="Time Limit (00:00:00)"
+              value={timeLimit}
+              onChangeText={setTimeLimit}
+              className="border p-2 rounded mb-4"
+            />
+            <Button title="Create" onPress={handleCreateRace} />
+            <Button title="Cancel" onPress={() => setModalVisible(false)} />
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 };
@@ -115,3 +167,4 @@ export default EventDetail;
   </View>
 )} */
 }
+

@@ -75,14 +75,6 @@ const EventDetail = () => {
           Group: {event.group_runner.name} {event.group_runner.department}
         </Text>
       </View>
-      {/* <View className="p-4 w-[90vw] m-auto my-2 rounded-xl">
-        <Text className="text-black font-pmedium text-2xl w-full text-center">
-          {event.subtitle}
-        </Text>
-        <Text className="text-black font-pregular text-lg text-justify">
-          {event.description}
-        </Text>
-      </View> */}
       <View className="w-[90vw] mx-auto my-2 rounded-xl items-center bg-white p-4">
         <Text className="text-primary-jungle font-psemibold text-3xl w-full text-center">
           Races

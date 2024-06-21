@@ -21,8 +21,8 @@ const CreateRaceMap = () => {
         console.log(data);
         if (data && data.event_location) {
           const startPoint = {
-            latitude: data.event_location.longitude,
-            longitude: data.event_location.latitude,
+            latitude: data.event_location.latitude,
+            longitude: data.event_location.longitude,
             latitudeDelta: 0.01,
             longitudeDelta: 0.01,
           };
@@ -61,7 +61,6 @@ const CreateRaceMap = () => {
       }));
 
       await saveListCheckpoints(raceId, checkpoints);
-      Alert.alert("Success", "Checkpoints saved successfully.");
       router.back(); // Navigate back to the previous page
     } catch (error) {
       console.error("Error saving checkpoints:", error);

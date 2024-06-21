@@ -44,7 +44,7 @@ const GroupList = () => {
   const handleJoinGroup = async (groupId) => {
     try {
       await joinGroup(groupId);
-      router.push("/event-list");
+      router.push("/(student)/event-list");
     } catch (error) {
       console.error("Error joining group:", error);
       Alert.alert("Error", "Something went wrong. Please try again.");

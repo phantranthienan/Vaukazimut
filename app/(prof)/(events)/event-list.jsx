@@ -3,6 +3,7 @@ import {
   Text,
   TouchableOpacity,
   ScrollView,
+  RefreshControl
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
@@ -10,7 +11,15 @@ import { fetchCoachEvents } from "../../../utils/useAPI";
 
 const EventList = () => {
   const [events, setEvents] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
   const router = useRouter();
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await getEvents();
+    setRefreshing(false);
+  };
+
 
   const getEvents = async () => {
     try {
@@ -38,8 +47,11 @@ const EventList = () => {
   }
 
   return (
-    <ScrollView className="bg-primary-emerald">
-      <View className="h-[100vh] w-[100vw] bg-primary-emerald">
+    <ScrollView className="bg-primary-emerald"
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+    }>
+      <View className="w-[100vw] bg-primary-emerald">
         {events.map((event) => (
           <TouchableOpacity
             activeOpacity={0.8}

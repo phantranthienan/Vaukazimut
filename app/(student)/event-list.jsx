@@ -25,6 +25,7 @@ const EventList = () => {
   const getEvents = async () => {
     try {
       const data = await fetchMyEvents();
+      console.log(data);
       setEvents(data.results);
     } catch (error) {
       console.error(error);
@@ -38,7 +39,7 @@ const EventList = () => {
 
   const handleEventPress = (eventId) => {
     // Navigate to the event-detail page with the eventId as a parameter
-    router.push(`/event-detail/${eventId}`);
+    router.push(`(student)/event-detail/${eventId}`);
   };
 
   if (events.length === 0) {
