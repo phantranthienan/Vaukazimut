@@ -213,6 +213,15 @@ const StudentMap = () => {
           }
           return prevValidatedBalises;
         });
+        setMarkers((prevMarkers) => {
+          // Update markers to trigger re-render
+          const updatedMarkers = [...prevMarkers];
+          updatedMarkers[baliseIndex] = {
+            ...updatedMarkers[baliseIndex],
+            validated: true,
+          };
+          return updatedMarkers;
+        });
         setModalVisible(false);
       } catch (error) {
         Alert.alert("Error", "Failed to record checkpoint. Please try again.");
