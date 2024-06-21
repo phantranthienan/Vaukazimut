@@ -121,6 +121,16 @@ const EventList = () => {
     }
   };
 
+  const handleFormEvent = async () => {
+    try {
+      setModalVisible(true);
+      await getGroups();
+      await getLocations();
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   const formatDateTime = (date) => {
     const day = String(date.getDate()).padStart(2, '0');
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -186,9 +196,7 @@ const EventList = () => {
         )}
         <CustomButton
           title="Create New Event"
-          handlePress={() => {
-            setModalVisible(!modalVisible);
-          }}
+          handlePress={handleFormEvent}
           containerStyles="w-[85vw] my-4"
           textStyles="text-2xl"
         />
