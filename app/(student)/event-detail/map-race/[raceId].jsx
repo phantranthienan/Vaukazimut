@@ -23,7 +23,6 @@ import {
   terminateRace,
   startRace,
 } from "../../../../utils/useAPI";
-import { getId } from "../../../../utils/handleAsyncStorage";
 
 const StudentMap = () => {
   const { raceId } = useLocalSearchParams();
@@ -42,6 +41,7 @@ const StudentMap = () => {
   const [isTerminated, setIsTerminated] = useState(false);
   const [time, setTime] = useState(0);
   const timerRef = useRef(null);
+  const locationIntervalRef = useRef(null);
   const [isLoading, setIsLoading] = useState(true); // Add loading state
 
   const [validatedBalises, setValidatedBalises] = useState([]);
@@ -79,13 +79,26 @@ const StudentMap = () => {
       timerRef.current = setInterval(() => {
         setTime((prevTime) => prevTime + 1);
       }, 1000);
-    } else if (!isStarted && timerRef.current) {
-      clearInterval(timerRef.current);
+
+      locationIntervalRef.current = setInterval(async () => {
+        const location = await getCurrentLocation();
+        setUserLocation(location);
+      }, 100); // Update location every 100 milliseconds
+    } else if (!isStarted) {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+      if (locationIntervalRef.current) {
+        clearInterval(locationIntervalRef.current);
+      }
     }
 
     return () => {
       if (timerRef.current) {
         clearInterval(timerRef.current);
+      }
+      if (locationIntervalRef.current) {
+        clearInterval(locationIntervalRef.current);
       }
     };
   }, [isStarted]);
@@ -117,7 +130,7 @@ const StudentMap = () => {
     try {
       setIsLoading(true); // Start loading
       const raceData = await fetchRaceDetails(raceId);
-      console.log(raceData);
+      // console.log(raceData);
       setMarkers(raceData.checkpoints);
       setStartPoint(raceData.event_location); // Set start point
       setTimeLimit(raceData.time_limit);
@@ -156,7 +169,7 @@ const StudentMap = () => {
   const startTimer = async () => {
     try {
       const raceRunner = await startRace(raceId);
-      console.log(raceRunner);
+      // console.log(raceRunner);
       setRaceRunnerId(raceRunner.data.id);
       setIsStarted(true);
     } catch (err) {
@@ -181,8 +194,7 @@ const StudentMap = () => {
 
   // Validate the balise
   const validateBalise = async (number) => {
-    let location = await getCurrentLocation();
-    setUserLocation(location);
+    console.log(userLocation);
     const baliseIndex = markers.findIndex(
       (marker) => marker.number === parseInt(number)
     );

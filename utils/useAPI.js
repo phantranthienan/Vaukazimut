@@ -224,24 +224,37 @@ const fetchCoachEvents = async () => {
     }
 }
 
-const createEvent = async (name, startTime, endTime, locationId, coachId, groupRunnerId, publish) => {
-    let body = {
-        name: name,
-        start: startTime,
-        end: endTime,
-        location_id: locationId,
-        coach_id: coachId,
-        group_runner_id: groupRunnerId,
-        publish: publish
-    }
+const createEvent = async (
+    name,
+    start,
+    end,
+    location_id,
+    group_runner_id,
+    department
+  ) => {
+    id = await getId();
+    id = parseInt(id);
+  
     try {
-        const res = await apiSource.post('/events-coach/', body)
-        return res.data;
+      let req = {
+        name: name,
+        start: start,
+        end: end,
+        location_id: location_id,
+        coach_id: id,
+        group_runner_id: group_runner_id,
+        department: 'STI',
+        publish: true,
+      };
+      const res = await apiSource.post('/events-coach/', req);
+      const token = await getToken();
+      console.log(token);
+      // console.log(res.data);
+      return res;
     } catch (err) {
-        console.log("Error creating event:", err);
-        Alert.alert(err.response.data.message);
+      console.log('Error creating event details:', err);
     }
-}
+  };
 
 const fetchCoachEventDetail = async (eventId) => {
     try {
