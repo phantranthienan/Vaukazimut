@@ -17,6 +17,12 @@ const EventLayout = () => {
           headerShown: false,
         }}
       />
+      <Stack.Screen
+        name="event-detail/create-race/[raceId].jsx"
+        options={{
+          headerShown: false,
+        }}
+      />
     </Stack>
   );
 };
